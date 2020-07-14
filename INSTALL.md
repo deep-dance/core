@@ -85,14 +85,7 @@ watch -n 0.5 nvidia-smi
 
 ## detectron2
 
-### Installation
-
-Our [Colab Notebook](https://colab.research.google.com/drive/16jcaJoc6bCFAQ96jDe2HwtXj7BMD_-m5)
-has step-by-step instructions that install detectron2.
-The [Dockerfile](docker)
-also installs detectron2 with a few simple commands.
-
-#### Requirements
+### Requirements
 - Linux or macOS with Python ≥ 3.6
 - PyTorch ≥ 1.4
 - [torchvision](https://github.com/pytorch/vision/) that matches the PyTorch installation.
@@ -101,7 +94,9 @@ also installs detectron2 with a few simple commands.
 - OpenCV, optional, needed by demo and visualization
 
 
-#### Build Detectron2 from Source
+### Build Detectron2 from Source
+
+#### CUDA
 
 gcc & g++ ≥ 5 are required. [ninja](https://ninja-build.org/) is recommended for faster build.
 After having them, run:
@@ -115,6 +110,10 @@ CC=clang CXX=clang++ python -m pip install ......
 ```
 
 Please refer to [detectron2](https://github.com/facebookresearch/detectron2/blob/master/INSTALL.md) for further information in the installation process.
+
+#### ROCm
+
+Need to pass `WITH_HIP` and `WITH_OPENCL` to build script. 
 
 ## OpenPose
 
