@@ -1,0 +1,6 @@
+[submodule "detector/detectron2"]
+	path = detector/detectron2
+	url = https://github.com/facebookresearch/detectron2.git
+[submodule "detector/VideoPose3D"]
+	path = detector/VideoPose3D
+	url = https://github.com/facebookresearch/VideoPose3D.git
