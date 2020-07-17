@@ -40,6 +40,7 @@ def run_external_script(folder):
         '--viz-camera', '0',
         '--viz-video', '../../data/train/' + folder + '/input.mp4',
         '--viz-output', '../../data/train/' + folder + '/pose3d.mp4',
+        '--viz-export', '../../data/train/' + folder + '/pose3d',
         '--viz-size', '6']))
 
 if __name__ == '__main__':
