@@ -86,12 +86,15 @@ python predict_2d_pose.py
 ##### Run 3D pose estimation
 
 ```
-python predict_2d_pose.py
+python predict_3d_pose.py
 ```
 
 ### Work for me: The Creator
 
-Coming soon...
+#### Simple matplot rendering
+```
+python3.6 render_pose3d_matplot.py ../data/train/seq_001/pose3d.npz --frames 90
+```
 
 ### Rotating Bones: The Renderer
 
