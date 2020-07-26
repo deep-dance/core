@@ -65,9 +65,18 @@ ffmpeg -i input_raw.mp4 -ss 3:55 -to 4:25 -c copy data/train/seq_[index]/input_s
 It is desired to crop input videos such that they match Human3.6m in terms of the ratio between movement area and background. It still needs to be researched, if this is really necessary, or if the pose estimation results are still good enough without this step. Reducing the size of the input video has a positive effect on computation time in any case.
 
 ```
-ffmpeg -i input_seq.mp4 -filter:v "crop=800:600" data/train/seq_[index]/input.mp4
+ffmpeg -i input_seq.mp4 -filter:v "crop=out_w:out_h:x:y" data/train/seq_[index]/input.mp4
 ```
 
+    out_w is the width of the output rectangle
+    out_h is the height of the output rectangle
+    x and y specify the top left corner of the output rectangle
+
+Resize videos:
+
+```
+ffmpeg -i input_seq.mp4 -vf scale=800:600 output.avi
+```
 
 ##### Run 2D pose estimation
 
