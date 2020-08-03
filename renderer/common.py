@@ -48,7 +48,7 @@ bones = [
 
 def init_plot():
     fig = plt.figure()
-    fig.set_size_inches(18.5, 10.5)
+    fig.set_size_inches(10, 6)
 
     ax = fig.add_subplot(111, projection='3d')
     ax.set_xlim3d(-1, 1)
@@ -64,7 +64,7 @@ def plot_pose(ax, frame):
     ax.set_zlim3d(0, 2)
 
     for kp in frame:
-        ax.scatter(kp[0], kp[1], kp[2])
+        ax.scatter(kp[0], kp[1], kp[2], color="black")
 
     for (j_from, j_to) in bones:
         ax.plot3D(
