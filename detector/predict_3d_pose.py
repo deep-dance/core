@@ -23,12 +23,13 @@ def get_parser():
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing 3D estimations on sequence level.")
     return parser
 
+
 def run_external_script(folder):
     print("----------------------------------------------------------")
     print("to-share::detector")
     print("----------------------------------------------------------")
     print(subprocess.check_output([
-        'python3.6', 'run.py',
+        '../detector-env/bin/python', 'run.py',
         '-d', 'custom',
         '-k', 'data/' + folder + '/pose2d',
         '-arc', '3,3,3,3,3',
@@ -38,7 +39,7 @@ def run_external_script(folder):
         '--viz-subject', 'detectron2',
         '--viz-action', 'custom',
         '--viz-camera', '0',
-        '--viz-video', '../../data/train/' + folder + '/input.mp4',
+        '--viz-video', '../../data/train/' + folder + '/input_seq.mp4',
         '--viz-output', '../../data/train/' + folder + '/pose3d.mp4',
         '--viz-export', '../../data/train/' + folder + '/pose3d',
         '--viz-size', '6']))
@@ -48,17 +49,18 @@ if __name__ == '__main__':
 
     os.chdir('VideoPose3D')
     basedir = '../../data/train/'
-    for folder in os.listdir(basedir):
-        pose3d_video = basedir + folder + '/pose3d.mp4'
-        print(pose3d_video)
-        if path.isfile(pose3d_video):
-            print("3D pose estimation found.")
-            if args.overwrite:
-                print("Flag detected. Overwriting...")
-                run_external_script(folder)
+    for video_folder in os.listdir(basedir):
+        for folder in os.listdir(basedir + video_folder):
+            pose3d_video = basedir + video_folder +'/' + folder + '/pose3d.mp4'
+            print(pose3d_video)
+            if path.isfile(pose3d_video):
+                print("3D pose estimation found.")
+                if args.overwrite:
+                    print("Flag detected. Overwriting...")
+                    run_external_script(video_folder +'/' + folder)
+                else:
+                    print("Skipping.")
             else:
-                print("Skipping.")
-        else:
-            run_external_script(folder)
-        
+                run_external_script(video_folder +'/' + folder)
+
     os.chdir('..')

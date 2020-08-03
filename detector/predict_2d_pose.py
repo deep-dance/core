@@ -103,11 +103,11 @@ def encode_for_videpose3d(boxes,keypoints,resolution, dataset_name):
 
 		prepared_boxes.append(boxes[i])
 		prepared_keypoints.append(keypoints[i][:,:2])
-		
+
 	boxes = np.array(prepared_boxes, dtype=np.float32)
 	keypoints = np.array(prepared_keypoints, dtype=np.float32)
 	keypoints = keypoints[:, :, :2] # Extract (x, y)
-	
+
 	# Fix missing bboxes/keypoints by linear interpolation
 	mask = ~np.isnan(boxes[:, 0])
 	indices = np.arange(len(boxes))
@@ -116,11 +116,11 @@ def encode_for_videpose3d(boxes,keypoints,resolution, dataset_name):
 	for i in range(17):
 		for j in range(2):
 			keypoints[:, i, j] = np.interp(indices, indices[mask], keypoints[mask, i, j])
-	
+
 	print('{} total frames processed'.format(len(boxes)))
 	print('{} frames were interpolated'.format(np.sum(~mask)))
 	print('----------')
-	
+
 	return [{
 		'start_frame': 0, # Inclusive
 		'end_frame': len(keypoints), # Exclusive
@@ -160,6 +160,7 @@ def predict_pose(pose_predictor, img_generator, output_path, dataset_name='detec
 				'h': img.shape[0],
 			}
 
+
 		print('{}      '.format(i+1), end='\r')
 
 	# Encode data in VidePose3d format and save it as a compressed numpy (.npz):
@@ -176,7 +177,7 @@ def run_internal_script(folder):
 	print("----------------------------------------------------------")
 	print("to-share::detector")
 	print("----------------------------------------------------------")
-	img_generator = read_video('../data/train/' + folder + '/input.mp4')  # or get them from a video
+	img_generator = read_video('../data/train/' + folder + '/input_seq.mp4')  # or get them from a video
 	output_path = '../data/train/' + folder + '/pose2d'
 	predict_pose(pose_predictor, img_generator, output_path)
 
@@ -192,27 +193,21 @@ if __name__ == '__main__':
 	args = get_parser().parse_args()
 
 	basedir = '../data/train/'
-	for folder in os.listdir(basedir):
-		pose2d_numpy = basedir + folder + '/pose2d.npz'
-		if path.isfile(pose2d_numpy):
-			print("2D pose estimation export (numpy) found.")
-			if args.overwrite:
-				print("Flag detected. Overwriting...")
-				run_internal_script(folder)
+	for video_folder in os.listdir(basedir):
+		for folder in os.listdir(basedir + video_folder):
+			pose2d_numpy = basedir + video_folder +'/' + folder + '/pose2d.npz'
+			if path.isfile(pose2d_numpy):
+				print("2D pose estimation export (numpy) found.")
+				if args.overwrite:
+					print("Flag detected. Overwriting...")
+					run_internal_script(video_folder +'/' + folder)
+				else:
+					print("Skipping.")
 			else:
-				print("Skipping.")
-		else:
-			run_internal_script(folder)
-		
-		# Copy 2D pose numpy files to VideoPose3D data directory, since their scripts do not work otherwise
-		videopose3d_path = 'VideoPose3D/data/data_2d_custom_data/' + folder
+				run_internal_script(video_folder +'/' + folder)
 
-		os.makedirs(videopose3d_path, exist_ok=True)
-		shutil.copyfile(pose2d_numpy, videopose3d_path + '/pose2d.npz')
+			# Copy 2D pose numpy files to VideoPose3D data directory, since their scripts do not work otherwise
+			videopose3d_path = 'VideoPose3D/data/data_2d_custom_data/' + video_folder +'/' + folder
 
-	
-
-
-
-
-	
+			os.makedirs(videopose3d_path, exist_ok=True)
+			shutil.copyfile(pose2d_numpy, videopose3d_path + '/pose2d.npz')
