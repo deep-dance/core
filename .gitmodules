@@ -3,4 +3,4 @@
 	url = https://github.com/facebookresearch/detectron2.git
 [submodule "detector/VideoPose3D"]
 	path = detector/VideoPose3D
-	url = git@github.com:zirkular/VideoPose3D.git
+	url = https://github.com/zirkular/VideoPose3D.git
