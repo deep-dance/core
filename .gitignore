@@ -1,1 +1,12 @@
 */.venv/*
+**/.ipynb_checkpoints
+**/creator-env
+**/detector-env
+data/tanz2
+data/wetransfer-875e0f
+**/input_seq.mp4
+**/pose3d.mp4
+detector/VideoPose3D
+detector/detectron2
+**/__pycache__
+creator/choreography

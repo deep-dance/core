@@ -57,6 +57,13 @@ Reference: https://rocmdocs.amd.com/en/latest/Deep_learning/Deep-learning.html#o
 
 ## Nvidia GPU
 
+### Cuda 10.1
+ 
+Follow this instruction: https://www.tensorflow.org/install/gpu#install_cuda_with_apt
+
+### Cuda 10.2
+
+**Note:** CUDA 10.2 is not compatible with Tensorflow 1.14.0
 **Note:** CUDA 10.0+ requires at least CMake 3.12.2+
 ```
 wget -c "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin"
