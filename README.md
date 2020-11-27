@@ -25,9 +25,9 @@ git clone --recursive https://github.com/deep-dance/core.git
 
 The repository reflects the parts mentioned above and seperates them into data, scripts, or other executables.
 
-##### 3. Check detectron2 installation
+##### 3. Setup Docker container
 
-Make sure [detectron2](INSTALL.md) was installed and the folder `detectron2` cloned properly.
+See [Docker instructions](DOCKER.md).
 
 ##### 4. Setup VideoPose3D
 
@@ -38,10 +38,8 @@ cd VideoPose3D
 mkdir checkpoint && cd checkpoint
 wget https://dl.fbaipublicfiles.com/video-pose-3d/pretrained_h36m_detectron_coco.bin
 ```
-
-There is one small adjustment needed in the VideoPose3D code to run with Python 3.6. In `detector/VideoPose3D/common/visualization.py`, line 91 needs to be commented out:
-```
-# ax.set_aspect('equal')
+for trajectory tracing also download addidional models 
+```https://drive.google.com/file/d/1kJKDjdpFcg7cXr3x_hV3lYL0Tm3ImsFY/view?usp=sharing
 ```
 
 #### Run on custom videos
