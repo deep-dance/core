@@ -38,9 +38,8 @@ cd VideoPose3D
 mkdir checkpoint && cd checkpoint
 wget https://dl.fbaipublicfiles.com/video-pose-3d/pretrained_h36m_detectron_coco.bin
 ```
-for trajectory tracing also download addidional models 
-```https://drive.google.com/file/d/1kJKDjdpFcg7cXr3x_hV3lYL0Tm3ImsFY/view?usp=sharing
-```
+for trajectory tracing also download addidional models [here](https://drive.google.com/file/d/1kJKDjdpFcg7cXr3x_hV3lYL0Tm3ImsFY/view?usp=sharing)
+This link was posted by one of the maintainers of VideoPose3D in the issue comments [here](https://github.com/facebookresearch/VideoPose3D/issues/145)
 
 #### Run on custom videos
 
