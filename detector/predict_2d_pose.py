@@ -205,9 +205,3 @@ if __name__ == '__main__':
 					print("Skipping.")
 			else:
 				run_internal_script(video_folder +'/' + folder)
-
-			# Copy 2D pose numpy files to VideoPose3D data directory, since their scripts do not work otherwise
-			videopose3d_path = 'VideoPose3D/data/data_2d_custom_data/' + video_folder +'/' + folder
-
-			os.makedirs(videopose3d_path, exist_ok=True)
-			shutil.copyfile(pose2d_numpy, videopose3d_path + '/pose2d.npz')

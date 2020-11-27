@@ -29,12 +29,12 @@ def run_external_script(folder):
     print("to-share::detector")
     print("----------------------------------------------------------")
     print(subprocess.check_output([
-        '../detector-env/bin/python', 'run.py',
+        'python', 'run.py',
         '-d', 'custom',
-        '-k', 'data/' + folder + '/pose2d',
+        '-k', '../../data/train/' + folder + '/pose2d',
         '-arc', '3,3,3,3,3',
         '-c', 'checkpoint',
-        '--evaluate', 'pretrained_h36m_detectron_coco.bin',
+        '--evaluate', 'pretrained_243_h36m_detectron_coco_wtraj.bin',
         '--render',
         '--viz-subject', 'detectron2',
         '--viz-action', 'custom',
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     basedir = '../../data/train/'
     for video_folder in os.listdir(basedir):
         for folder in os.listdir(basedir + video_folder):
-            pose3d_video = basedir + video_folder +'/' + folder + '/pose3d.mp4'
+            pose3d_video = basedir + video_folder +'/' + folder + '/pose3d.npz'
             print(pose3d_video)
             if path.isfile(pose3d_video):
                 print("3D pose estimation found.")
