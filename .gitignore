@@ -3,6 +3,7 @@
 **/creator-env
 **/detector-env
 data/tanz2
+data/train/test
 data/wetransfer-875e0f
 **/input_seq.mp4
 **/pose3d.mp4
