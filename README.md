@@ -16,7 +16,7 @@ The following section will explain how the pool of sample sequences can be exten
 #### Prepare environment
 
 ##### 1. Follow [installation](INSTALL.md) guide and setup the machine learning stack and other required software.
-(deprecated with Dockerfile. Start with cloning the repository)
+(deprecated with Dockerfile. Start with cloning the repository instead (2.))
 
 ##### 2. Clone repository
 
@@ -27,7 +27,7 @@ git clone --recursive https://github.com/deep-dance/core.git
 The repository reflects the parts mentioned above and seperates them into data, scripts, or other executables.
 
 ##### 3. Setup Docker container
-
+Note, that the Docker container only works for a setup with nvidia graphic cards that can run cuda.
 See [Docker instructions](DOCKER.md).
 
 ##### 4. Setup VideoPose3D
