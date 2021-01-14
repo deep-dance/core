@@ -16,6 +16,7 @@ The following section will explain how the pool of sample sequences can be exten
 #### Prepare environment
 
 ##### 1. Follow [installation](INSTALL.md) guide and setup the machine learning stack and other required software.
+(deprecated with Dockerfile. Start with cloning the repository)
 
 ##### 2. Clone repository
 
