@@ -25,3 +25,4 @@ for the correct token check the terminal output in docker container.
 The -v option mounts the ../core folder to the container. 
 
 
+Note: You still have to download the pretrained models for VideoPose3D as described in the main readme file in point 4.
