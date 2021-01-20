@@ -4,11 +4,12 @@
 
 The project is seperated into a few different parts:
 
-- Detector: Predict 3d poses in single camera videos for custom dataset creation
-- Creator: RNN sequence generator
-- Renderer: Blender project which animates a character with generated sequences
+- abstract: Predict 3d poses in single camera videos for custom keypoint dataset creation
+- learn: Train RNN with keypoints and generate new sequences
+- [view](https://github.com/deep-dance/view): 3D keypoint sequencing
+- beautify: Blender project which animates a character with generated sequences
 
-### Mining Movement: The Detector
+### abstract
 
 The project comes with a few sample sequences which already went through the process of 3D pose prediction.
 The following section will explain how the pool of sample sequences can be extended with custom video sequences.
@@ -96,14 +97,20 @@ python predict_2d_pose.py
 python predict_3d_pose.py
 ```
 
-### Work for me: The Creator
+### learn
 
-#### Simple matplot rendering
+Please run the Jupyter Notebook in order to train the network.
+
+### view
+
+Feel free to checkout the [3D sequence visualization tool](https://github.com/deep-dance/view).
+
+#### Legacy: Simple matplot rendering
 ```
 python3.6 render_pose3d_matplot.py ../data/train/seq_001/pose3d.npz --frames 90
 ```
 
-### Rotating Bones: The Renderer
+### beautify
 
 Several experiments with Blender have been done without any ground-breaking results. A component which translates keypoints into skeletal bone rotations for Blender needs to developed.
 
@@ -111,5 +118,6 @@ Several experiments with Blender have been done without any ground-breaking resu
 
 ### Maintainer
 
-@erak
-@nikozoe
+[@nikozoe](https://github.com/nikozoe)
+[@LeaLazer](https://github.com/LeaLazer)
+[@erak](https://github.com/erak)
