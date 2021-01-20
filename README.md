@@ -18,7 +18,20 @@ The following section will explain how the pool of sample sequences can be exten
 ##### 1. Follow [installation](INSTALL.md) guide and setup the machine learning stack and other required software.
 (deprecated with Dockerfile. Start with cloning the repository instead (2.))
 
-##### 2. Clone repository
+##### 2. Setup DVC
+
+We're using [DVC](https://dvc.org/). Please install the latest version.
+
+###### Directories
+
+The following directories are managed by DVC (look out for `.dvc` file):
+
+```
+data/train/video/example
+data/train/video/deep-dance
+```
+
+##### 3. Clone repository
 
 ```
 git clone --recursive https://github.com/deep-dance/core.git
@@ -26,11 +39,13 @@ git clone --recursive https://github.com/deep-dance/core.git
 
 The repository reflects the parts mentioned above and seperates them into data, scripts, or other executables.
 
-##### 3. Setup Docker container
+
+##### 4. Setup Docker container
+
 Note, that the Docker container only works for a setup with nvidia graphic cards that can run cuda.
 See [Docker instructions](DOCKER.md).
 
-##### 4. Setup VideoPose3D
+##### 5. Setup VideoPose3D
 
 Make sure the folder `VideoPose3D` was cloned properly and download the pretrained model for 3D pose estimation.
 
