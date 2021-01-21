@@ -15,22 +15,61 @@ The following section will explain how the pool of sample sequences can be exten
 
 #### Prepare environment
 
-##### 1. Follow [installation](INSTALL.md) guide and setup the machine learning stack and other required software.
-(deprecated with Dockerfile. Start with cloning the repository instead (2.))
+##### 1. Setup DVC
+
+We're using [DVC](https://dvc.org/). Please install the latest version.
+
+###### Directories
+
+The following directories are managed by DVC (look out for `.dvc` file):
+
+```
+data/train/video/example
+data/train/video/deep-dance
+```
+
+###### Remotes
+
+Currently, there is only one remote configured, which works on a server with a locally shared folder between users:
+
+```
+/home/shared/dvc
+```
+
+If that folder does not exist, DVC can't pull the files.
+
+###### Workflow
+
+The DVC workflow is very similar to Git. In a project folder, you could initialize and use DVC with
+
+```
+$ dvc init
+$ dvc add data/*
+$ dvc remote add -d local /home/shared/dvc
+$ dvc run -d data -o model.p train.py
+$ dvc push
+```
 
 ##### 2. Clone repository
 
 ```
-git clone --recursive https://github.com/deep-dance/core.git
+$ git clone --recursive https://github.com/deep-dance/core.git
 ```
 
 The repository reflects the parts mentioned above and seperates them into data, scripts, or other executables.
 
+After cloning the respository, all data, managed by DVC also needs to be pulled. 
+
+```
+$ dvc pull
+```
+
 ##### 3. Setup Docker container
+
 Note, that the Docker container only works for a setup with nvidia graphic cards that can run cuda.
 See [Docker instructions](DOCKER.md).
 
-##### 4. Setup VideoPose3D
+##### 5. Setup VideoPose3D
 
 Make sure the folder `VideoPose3D` was cloned properly and download the pretrained model for 3D pose estimation.
 
