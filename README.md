@@ -31,6 +31,16 @@ data/train/video/example
 data/train/video/deep-dance
 ```
 
+###### Remotes
+
+Currently, there is only one remote configured, which works on a server with a locally shared folder between users:
+
+```
+/home/shared/dvc
+```
+
+If that folder does not exist, DVC can't pull the files.
+
 ##### 3. Clone repository
 
 ```
