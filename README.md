@@ -85,13 +85,41 @@ This link was posted by one of the maintainers of VideoPose3D in the issue comme
 
 This assumes the data structure to be 
 ```
-data/train/seq_[index]/input.mp4
-data/train/seq_[index]/pose2d.npz
-data/train/seq_[index]/pose3d.mp4
+data/train/video/deep-dance/<dancer>/<tag-list>/input.mp4
+data/train/video/deep-dance/<dancer>/<tag-list>/metadata.json
+data/train/video/deep-dance/<dancer>/<tag-list>/pose2d.npz
+data/train/video/deep-dance/<dancer>/<tag-list>/pose3d.mp4
 ```
 It is recommended to prepare videos to match the Human3,6m data set as closely as possible. Video sequences should be saved in the folder mentioned above and should have a length of 30 seconds.
 
 ##### Preprocess videos
+
+###### Motion database
+
+It's required to setup a motion database that reflects the dataset and contains metadata on every video in it. The current workflow requires the motion database to include the following metadata: name of the dancer and mapping of a video name to a list of tags. Both will be used while creating the dataset from custom custom videos. The motion database needs to be stored in a JSON file:
+
+```
+{
+    "dancers": [
+        {
+            "name": "adancer",
+            "videos": {
+                "V0001": [ "normal", "spot", "frontal", "standing" ]
+            }
+        }
+    ]
+```
+
+There's a script that is used to preproces and store raw video files into the format explained above and it can be called like this:
+
+```
+python3 data/preprocess_videos.py --input-path videos/adancer --output-path train/video/deep-dance/adancer --database motion-db.json --metadata
+```
+
+The script takes an input path from which all video file are being picked up, scaled down and saved together with their metadata file. The folder structure that's being created depends on the tags given by the motion database. The metadata file contains a path to the original video it was created from and the tags given by the motion database.
+
+
+###### ffmpeg helpers
 
 Cut videos into sequences of 30 seconds, e.g.
 
