@@ -1,86 +1,170 @@
+import argparse
+import json
+import math
 import os
 import subprocess
-import math
-import argparse
+
+
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description="Cut video into sequences and scale down to 800x600")
+        description='Pre-process videos, targeting 800x600 @ 25fps. ' +
+            'Reads additional information from JSON database.')
+    
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--folder', help='folder with video files')
-    group.add_argument('--file', help='video file')
-    parser.add_argument('--output_folder',
-                        help='folder path to where the sequences will be stored',
-                        default='./train')
-    parser.add_argument('--cut_duration',
-                            help='length in seconds of the sequences into which video(s) is(are) cut',
-                            default=30, type=int)
+
+    group.add_argument('--input-path',
+        help='Folder with video files to process.')
+    
+    parser.add_argument('--output-path',
+        help='Folder where processed videos will be stored.')
+    
+    parser.add_argument('--database',
+        help='JSON file that stores the motion database.',
+        required=True)
+    
+    parser.add_argument('--metadata',
+        action='store_true',
+        help='Create JSON file containing basic metadata (input file etc.)')
+    
+    parser.add_argument('--debug',
+        action='store_true',
+        help='Print debug output.')
+    
     return parser
 
 def get_video_duration(file):
-    #get duration of video
-    command_duration =['ffprobe',
-              '-i', file,
-              '-show_entries', 'format=duration',
-              '-v', 'quiet',
-              '-of', 'csv=p=0']
-    duration = subprocess.check_output(command_duration)
+    command = ['ffprobe',
+        '-i', file,
+        '-show_entries', 'format=duration',
+        '-v', 'quiet',
+        '-of', 'csv=p=0']
+
+    duration = subprocess.check_output(command)
     return duration
 
-#scale video
 def create_scaled_video(file, out_file):
-    command_scale = ['ffmpeg', '-i', file, '-vf', 'scale=800:600', out_file]
-    subprocess.run(command_scale)
+    command = ['ffmpeg',
+        '-i', file,
+        '-vf',
+        'scale=800:600',
+        out_file]
+
+    subprocess.run(command)
 
 def remove_file(file):
-    command_remove = ['rm', file]
-    subprocess.run(command_remove)
+    command = ['rm', file]
+    subprocess.run(command)
 
 
 def cut_video_sequence(video_file, start, duration, out_folder, out_file):
-    cut_command = ['ffmpeg',
-                    '-ss', str(start),
-                    '-i', video_file,
-                    '-t', str(duration),
-                    '-c', 'copy', out_folder + '/' + out_file]
+    command = ['ffmpeg',
+        '-ss', str(start),
+        '-i', video_file,
+        '-t', str(duration),
+        '-c', 'copy', out_folder + '/' + out_file]
+
     subprocess.run(['mkdir', '-p', out_folder])
-    subprocess.run(cut_command)
+    subprocess.run(command)
 
-def preprocess_video(path_to_video, output_folder, cut_duration):
-    print("processing ", path_to_video)
-    file = os.path.basename(path_to_video)
-    print(file)
+def create_metadata_file(filename, video_path, dancer_name, base, database):
+    metadata = {}
+    metadata['file'] = []
+    metadata['file'].append({
+        'source': video_path,
+    })
+
+    dataset = find_dataset(dancer_name, database)
+    if dataset:
+        try:
+            metadata['info'] = []
+            metadata['info'].append({
+                'tags': dataset['videos'][base],
+            })
+        except KeyError:
+            print('Key not found')
+    with open(filename, 'w') as file:
+        json.dump(metadata, file)
+
+def read_database_file(filename):
+    with open(filename) as json_file:
+        data = json.load(json_file)
+        return data
+
+def build_folder_name(dancer_name, filename, database):
+    dataset = find_dataset(dancer_name, database)
+    if dataset:
+        try:
+            tags = dataset['videos'][filename]
+            folder_name = '_'.join(tags)
+            return folder_name    
+        except KeyError:
+            print('Key not found')
+
+    return ''
+
+def find_dataset(dancer_name, database):
+    for dataset in database['dancers']:
+        if dataset['name'] == dancer_name:
+            return dataset
+
+    return false
+
+
+def preprocess_video(video_path, input_path, output_path, database,
+    metadata=False, debug=False):
+    
+    file = os.path.basename(video_path)
     base = os.path.splitext(file)[0]
-    scaled_file = "scaled" + file
-    create_scaled_video(path_to_video, scaled_file)
-    duration = get_video_duration(scaled_file)
-    # number of cuts
-    n_seqs = math.ceil(float(duration[:-2])/cut_duration)
+    dancer_name = os.path.basename(os.path.normpath(input_path))
+    folder_name = build_folder_name(dancer_name, base, database)
 
-    # create folders and cut video into sequences
-    for i in range(n_seqs):
-        path_to_folder = output_folder + '/' + base + '/seq_' + str(i)
-        cut_video_sequence(scaled_file, i*cut_duration, cut_duration, path_to_folder,'input_seq.mp4' )
-    remove_file(scaled_file)
+    if folder_name:
+        output_path = output_path + '/' + folder_name
+        processed_file = output_path + '/' + 'input.mp4'
+        metadata_file = output_path + '/' + 'metadata.json'
+        
+        if debug:
+            print('Processing', file)
+            print(os.path.abspath(processed_file))
+            print(os.path.abspath(metadata_file))
 
+        subprocess.run(['mkdir', '-p', os.path.abspath(output_path)])
 
+        create_scaled_video(video_path, processed_file)
+
+        if metadata:
+                create_metadata_file(metadata_file,
+                    os.path.abspath(video_path),
+                    dancer_name,
+                    base,
+                    database)
+    else:
+        print('No entry in database found for ', dancer_name, '. Aborting.')
+        
 if __name__ == '__main__':
-
     args = get_parser().parse_args()
 
-    if args.file:
-        print("parsed video file")
-        path_to_video = args.file
-        preprocess_video(path_to_video, args.output_folder, args.cut_duration )
+    if args.input_path:
+        input_path = args.input_path
+        output_path = args.output_path if args.output_path else args.input_path
 
-    elif args.folder:
-        folder = args.folder
-        print("parsed folder ", folder)
-        for file in next(os.walk(folder))[2]:
-                path_to_video = folder + '/' + file
-                preprocess_video(path_to_video, args.output_folder, args.cut_duration )
+        print('\n')
+        print('Reading database file', args.database)
+        print('Processing folder', os.path.abspath(input_path))
 
+        database = read_database_file(args.database)
 
+        for file in next(os.walk(input_path))[2]:
+            video_path = input_path + '/' + file
+            preprocess_video(video_path,
+                input_path,
+                output_path,
+                database,
+                args.metadata,
+                args.debug)
 
     else:
-        print("no path to video file nor to folder with video files specified")
+        print('No path to folder containing video files specified.')
+
+    print('\n')
