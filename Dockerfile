@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
+FROM nvidia/cuda:11.0.3-cudnn8-devel-ubuntu20.04
 ENV LANG C.UTF-8
 
 ARG APT_INSTALL="apt-get install -y --no-install-recommends" 
@@ -84,6 +84,8 @@ RUN wget -O ~/get-pip.py \
 
 COPY requirements.txt /home/deep-dance 
 
+RUN ${PIP_INSTALL} --pre torch torchvision torchaudio -f https://download.pytorch.org/whl/nightly/cu110/torch_nightly.html
+
 # requierements from file and detectron
 RUN ${PIP_INSTALL} -r requirements.txt \
         && \
@@ -91,7 +93,7 @@ RUN ${PIP_INSTALL} -r requirements.txt \
 # which makes things more complicated otherwise. -> see Dockerfiles in official 
 # Detectron2 repository
     ${PIP_INSTALL} detectron2 -f \
-  https://dl.fbaipublicfiles.com/detectron2/wheels/cu101/torch1.5/index.html 
+  https://dl.fbaipublicfiles.com/detectron2/wheels/cu110/torch1.7/index.html 
 
 # Set a fixed model cache directory.
 ENV FVCORE_CACHE="/tmp"
