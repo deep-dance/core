@@ -85,15 +85,25 @@ RUN wget -O ~/get-pip.py \
 COPY requirements.txt /home/deep-dance 
 
 RUN ${PIP_INSTALL} --pre torch torchvision torchaudio -f https://download.pytorch.org/whl/nightly/cu110/torch_nightly.html
+RUN ${PIP_INSTALL} -r requirements.txt
+RUN ${PIP_INSTALL} 'git+https://github.com/facebookresearch/fvcore'
+# install detectron2
+RUN git clone https://github.com/facebookresearch/detectron2 detectron2_repo
+# set FORCE_CUDA because during `docker build` cuda is not accessible
+ENV FORCE_CUDA="1"
+# This will by default build detectron2 for all common cuda architectures and take a lot more time,
+# because inside `docker build`, there is no way to tell which architecture will be used.
+ARG TORCH_CUDA_ARCH_LIST="Kepler;Kepler+Tesla;Maxwell;Maxwell+Tegra;Pascal;Volta;Turing"
+ENV TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST}"
 
-# requierements from file and detectron
-RUN ${PIP_INSTALL} -r requirements.txt \
-        && \
-# we install precompiled version because cuda has to be available during compilation which it isn't while building the docker container
-# which makes things more complicated otherwise. -> see Dockerfiles in official 
-# Detectron2 repository
-    ${PIP_INSTALL} detectron2 -f \
-  https://dl.fbaipublicfiles.com/detectron2/wheels/cu110/torch1.7/index.html 
+RUN ${PIP_INSTALL} -e detectron2_repo
+
+
+# Set a fixed model cache directory.
+ENV FVCORE_CACHE="/tmp"
+
+
+
 
 # Set a fixed model cache directory.
 ENV FVCORE_CACHE="/tmp"
