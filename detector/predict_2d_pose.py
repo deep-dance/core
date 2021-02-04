@@ -62,6 +62,7 @@ def read_video(filename):
             '-f', 'image2pipe',
             '-pix_fmt', 'bgr24',
             '-vsync', '0',
+			'-loglevel', '16',
             '-vcodec', 'rawvideo', '-']
 
     pipe = sp.Popen(command, stdout=sp.PIPE, bufsize=-1)
@@ -139,6 +140,8 @@ def predict_pose(pose_predictor, img_generator, output_path, dataset_name='detec
 	keypoints = []
 	resolution = None
 
+	print ('Predicting pose in frame:')
+
 	# Predict poses:
 	for i, img in enumerate(img_generator):
 		pose_output = pose_predictor(img)
@@ -172,13 +175,14 @@ def predict_pose(pose_predictor, img_generator, output_path, dataset_name='detec
 
 	print ('All done!')
 
-def run_internal_script(folder):
+def run_internal_script(basedir, folder):
 	# Predict poses and save the result:
 	print("----------------------------------------------------------")
 	print("to-share::detector")
 	print("----------------------------------------------------------")
-	img_generator = read_video('../data/train/' + folder + '/input_seq.mp4')  # or get them from a video
-	output_path = '../data/train/' + folder + '/pose2d'
+	print('Predicting 2D pose in ', basedir + '/' + folder + '/input.mp4')
+	img_generator = read_video(basedir + '/' + folder + '/input.mp4')  # or get them from a video
+	output_path = basedir + '/' + folder + '/pose2d'
 	predict_pose(pose_predictor, img_generator, output_path)
 
 
@@ -192,16 +196,16 @@ if __name__ == '__main__':
 
 	args = get_parser().parse_args()
 
-	basedir = '../data/train/'
+	basedir = '../data/train/video/deep-dance'
 	for video_folder in os.listdir(basedir):
-		for folder in os.listdir(basedir + video_folder):
-			pose2d_numpy = basedir + video_folder +'/' + folder + '/pose2d.npz'
+		for folder in os.listdir(basedir + '/' + video_folder):
+			pose2d_numpy = basedir  + '/' + video_folder +'/' + folder + '/pose2d.npz'
 			if path.isfile(pose2d_numpy):
 				print("2D pose estimation export (numpy) found.")
 				if args.overwrite:
 					print("Flag detected. Overwriting...")
-					run_internal_script(video_folder +'/' + folder)
+					run_internal_script(basedir, video_folder + '/' + folder)
 				else:
 					print("Skipping.")
 			else:
-				run_internal_script(video_folder +'/' + folder)
+				run_internal_script(basedir, video_folder +'/' + folder)
