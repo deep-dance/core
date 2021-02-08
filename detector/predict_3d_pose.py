@@ -25,9 +25,6 @@ def get_parser():
 
 
 def run_external_script(basedir, folder):
-    print("----------------------------------------------------------")
-    print("to-share::detector")
-    print("----------------------------------------------------------")
     print(subprocess.check_output([
         'python', 'run.py',
         '-d', 'custom',
@@ -39,28 +36,34 @@ def run_external_script(basedir, folder):
         '--viz-subject', 'detectron2',
         '--viz-action', 'custom',
         '--viz-camera', '0',
-        '--viz-video', basedir + '/' + folder + '/input.mp4',
-        '--viz-output', basedir + '/' + folder + '/pose3d.mp4',
         '--viz-export', basedir + '/' + folder + '/pose3d',
         '--viz-size', '6']))
 
 if __name__ == '__main__':
+    print("==========================================================")
+    print("to-share::detector")
+    print("==========================================================")
+
     args = get_parser().parse_args()
 
     os.chdir('VideoPose3D')
     basedir = '../../data/train/video/deep-dance'
     for video_folder in os.listdir(basedir):
-        for folder in os.listdir(basedir + '/' + video_folder):
-            pose3d_video = basedir  + '/' + video_folder + '/' + folder + '/pose3d.npz'
-            print(pose3d_video)
-            if path.isfile(pose3d_video):
-                print("3D pose estimation found.")
-                if args.overwrite:
-                    print("Flag detected. Overwriting...")
-                    run_external_script(basedir, video_folder + '/' + folder)
+        if os.path.isdir(basedir + '/' + video_folder):
+            print('\n')
+            print('Predicting 3D poses for videos in folder \"' + video_folder + '\"...')
+            print("----------------------------------------------------------")
+            for folder in os.listdir(basedir + '/' + video_folder):
+                pose3d_video = basedir  + '/' + video_folder + '/' + folder + '/pose3d.npz'
+                print(pose3d_video)
+                if path.isfile(pose3d_video):
+                    print("3D pose estimation found.")
+                    if args.overwrite:
+                        print("Flag detected. Overwriting...")
+                        run_external_script(basedir, video_folder + '/' + folder)
+                    else:
+                        print("Skipping.")
                 else:
-                    print("Skipping.")
-            else:
-                run_external_script(basedir, video_folder + '/' + folder)
+                    run_external_script(basedir, video_folder + '/' + folder)
 
     os.chdir('..')
