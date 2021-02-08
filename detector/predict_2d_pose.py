@@ -177,9 +177,6 @@ def predict_pose(pose_predictor, img_generator, output_path, dataset_name='detec
 
 def run_internal_script(basedir, folder):
 	# Predict poses and save the result:
-	print("----------------------------------------------------------")
-	print("to-share::detector")
-	print("----------------------------------------------------------")
 	print('Predicting 2D pose in ', basedir + '/' + folder + '/input.mp4')
 	img_generator = read_video(basedir + '/' + folder + '/input.mp4')  # or get them from a video
 	output_path = basedir + '/' + folder + '/pose2d'
@@ -188,7 +185,11 @@ def run_internal_script(basedir, folder):
 
 
 if __name__ == '__main__':
+	print("==========================================================")
+	print("to-share::detector")
+	print("==========================================================")
 	# Init pose predictor:
+
 	model_config_path = 'detectron2/configs/COCO-Keypoints/keypoint_rcnn_X_101_32x8d_FPN_3x.yaml'
 	model_weights_path = 'detectron2://COCO-Keypoints/keypoint_rcnn_X_101_32x8d_FPN_3x/139686956/model_final_5ad38f.pkl'
 
@@ -198,14 +199,18 @@ if __name__ == '__main__':
 
 	basedir = '../data/train/video/deep-dance'
 	for video_folder in os.listdir(basedir):
-		for folder in os.listdir(basedir + '/' + video_folder):
-			pose2d_numpy = basedir  + '/' + video_folder +'/' + folder + '/pose2d.npz'
-			if path.isfile(pose2d_numpy):
-				print("2D pose estimation export (numpy) found.")
-				if args.overwrite:
-					print("Flag detected. Overwriting...")
-					run_internal_script(basedir, video_folder + '/' + folder)
+		if os.path.isdir(basedir + '/' + video_folder):
+			print('\n')
+			print('Predicting 2D poses for videos in folder \"' + video_folder + '\"...')
+			print("----------------------------------------------------------")
+			for folder in os.listdir(basedir + '/' + video_folder):
+				pose2d_numpy = basedir + '/' + video_folder + '/' + folder + '/pose2d.npz'
+				if path.isfile(pose2d_numpy):
+					print("2D pose estimation export (numpy) found.")
+					if args.overwrite:
+						print("Flag detected. Overwriting...")
+						run_internal_script(basedir, video_folder + '/' + folder)
+					else:
+						print("Skipping.")
 				else:
-					print("Skipping.")
-			else:
-				run_internal_script(basedir, video_folder +'/' + folder)
+					run_internal_script(basedir, video_folder +'/' + folder)
