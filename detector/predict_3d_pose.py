@@ -24,20 +24,23 @@ def get_parser():
     return parser
 
 
-def run_external_script(basedir, folder):
-    print(subprocess.check_output([
-        'python', 'run.py',
-        '-d', 'custom',
-        '-k', basedir + '/' + folder + '/pose2d',
-        '-arc', '3,3,3,3,3',
-        '-c', 'checkpoint',
-        '--evaluate', 'pretrained_243_h36m_detectron_coco_wtraj.bin',
-        '--render',
-        '--viz-subject', 'detectron2',
-        '--viz-action', 'custom',
-        '--viz-camera', '0',
-        '--viz-export', basedir + '/' + folder + '/pose3d',
-        '--viz-size', '6']))
+def run_external_script(input_folder):
+    if os.path.exists(input_folder + '/pose2d.npz'):
+        print(subprocess.check_output([
+            'python', 'run.py',
+            '-d', 'custom',
+            '-k', input_folder + '/pose2d',
+            '-arc', '3,3,3,3,3',
+            '-c', 'checkpoint',
+            '--evaluate', 'pretrained_243_h36m_detectron_coco_wtraj.bin',
+            '--render',
+            '--viz-subject', 'detectron2',
+            '--viz-action', 'custom',
+            '--viz-camera', '0',
+            '--viz-export', input_folder + '/pose3d',
+            '--viz-size', '6']).decode("utf-8"))
+    else:
+        print("An error occured. No 2D pose estimation found!")
 
 if __name__ == '__main__':
     print("==========================================================")
@@ -54,16 +57,18 @@ if __name__ == '__main__':
             print('Predicting 3D poses for videos in folder \"' + video_folder + '\"...')
             print("----------------------------------------------------------")
             for folder in os.listdir(basedir + '/' + video_folder):
-                pose3d_video = basedir  + '/' + video_folder + '/' + folder + '/pose3d.npz'
-                print(pose3d_video)
+                input_folder = basedir  + '/' + video_folder + '/' + folder
+                pose3d_video = input_folder + '/pose3d.npz'
+                print('')
+                print('Computing ' + input_folder)
                 if path.isfile(pose3d_video):
                     print("3D pose estimation found.")
                     if args.overwrite:
                         print("Flag detected. Overwriting...")
-                        run_external_script(basedir, video_folder + '/' + folder)
+                        run_external_script(input_folder)
                     else:
                         print("Skipping.")
                 else:
-                    run_external_script(basedir, video_folder + '/' + folder)
+                    run_external_script(input_folder)
 
     os.chdir('..')
