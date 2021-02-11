@@ -9,7 +9,7 @@ sudo docker build --build-arg UID=$(id -u) -t deep-dance:v0 .
 
 To run the container do 
 ```
-sudo docker run --gpus all -it -p 6666:8888 -v /path to folder /core:/home/deep-dance/core deep-dance:v0 bash
+sudo docker run --gpus all -it -p 6666:8888 -v /path_to_local_folder_/core:/home/deep-dance/core deep-dance:v0 bash
 ```
 
 -p 6666:8888 exposes the jupyter port and is optional. To start a jupyter notebook server in the container do
