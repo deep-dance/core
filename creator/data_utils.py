@@ -17,15 +17,15 @@ all_tags = set([tag for folderlist in motion_db.values() for folder in folderlis
 
 
 
-def get_training_data(dancers = "all", tags = "all", look_back = 15, target_len = 1):
+def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1):
     """loads data 
     
     Args:
-      dancers: list of dancers to include, i.e ['Maria', 'Raymond']
+      dancers: list of dancers to include, i.e ['maria', 'raymond']
       tags: list of tags to include, i.e ['impro', 'standing'], can also be list of lists 
             if tags should only be included if they occur in combination, i.e ["impro", ["allbody", "uplevel"]]
       lookback: int, length of pose sequences in which data is cut for input into the model
-      target_len: int, length of target poses the model is supposed to predict
+      target_lenght: int, length of target poses the model is supposed to predict
 
     Returns:
       X,y i.e input (X),target (y) both numpy arrays for model training
@@ -66,13 +66,15 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_len 
     for dataset in data:
         # reshape input to be [samples, features = (keypoints*3dim)] 
         dataset = np.reshape(dataset,  (dataset.shape[0], dataset.shape[1]*dataset.shape[2]))
-        for i in range(len(dataset) - look_back-1):
+        for i in range(len(dataset) - look_back - target_length):
             # dataX has dimension [samples, lookback, features = (keypoints*3dim)] 
             a = dataset[i:(i + look_back), :]     
             dataX.append(a)
             # dataY has dimension [samples, features = (keypoints*3dim)] 
-            dataY.append(dataset[i + look_back, :])
+            dataY.append(dataset[i + look_back : i + look_back + target_length, :])
+            
     return np.array(dataX), np.array(dataY)
+
 
 def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3, temp=1.0, sigma_temp=0.0, look_back=10):
     """Generates aperformance
