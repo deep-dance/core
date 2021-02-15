@@ -1,0 +1,66 @@
+FROM tensorflow/tensorflow:2.4.1-gpu-jupyter
+ENV LANG C.UTF-8
+
+ARG APT_INSTALL="apt-get install -y --no-install-recommends" 
+ARG PIP_INSTALL="python -m pip --no-cache-dir install --user"
+ARG GIT_CLONE="git clone --depth 10"
+
+RUN    rm -rf /var/lib/apt/lists/* \
+           /etc/apt/sources.list.d/cuda.list \
+           /etc/apt/sources.list.d/nvidia-ml.list && \
+    apt-get update 
+
+# ==================================================================
+# tools
+# ------------------------------------------------------------------
+
+RUN DEBIAN_FRONTEND=noninteractive ${APT_INSTALL} \
+        build-essential \
+        apt-utils \
+        libsm6 libxext6 libxrender-dev \
+        ca-certificates \
+        wget \
+        git \
+        vim \
+        libssl-dev \
+        curl \
+        unzip \
+        unrar \
+        ffmpeg \
+        && \
+    ${GIT_CLONE} https://github.com/Kitware/CMake ~/cmake && \
+    cd ~/cmake && \
+    ./bootstrap && \
+    make -j"$(nproc)" install 
+
+# ==================================================================
+# config & cleanup
+# ------------------------------------------------------------------
+
+RUN ldconfig && \
+    apt-get clean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/* /tmp/* ~/*
+
+
+
+# ==================================================================
+# Add non-priviledged user
+# ------------------------------------------------------------------
+
+ARG UID=1000
+RUN useradd -m -l -r -u $UID deep-dance -g sudo 
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER $UID
+WORKDIR /home/deep-dance
+ENV PATH="/home/deep-dance/.local/bin:${PATH}"
+
+# ==================================================================
+# copy requirements and install python packages
+# ------------------------------------------------------------------
+
+
+COPY tf_requirements.txt /home/deep-dance 
+
+RUN ${PIP_INSTALL} -r tf_requirements.txt
+
