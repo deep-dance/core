@@ -14,10 +14,7 @@ for dancer in dancers:
 #get all tags 
 all_tags = set([tag for folderlist in motion_db.values() for folder in folderlist for tag in folder.split("_")])
 
-
-
-
-def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1):
+def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True):
     """loads data 
     
     Args:
@@ -26,6 +23,7 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
             if tags should only be included if they occur in combination, i.e ["impro", ["allbody", "uplevel"]]
       lookback: int, length of pose sequences in which data is cut for input into the model
       target_lenght: int, length of target poses the model is supposed to predict
+      traj: if False, subtracts the hip trajectory from all other keypoints but not from the hip itself
 
     Returns:
       X,y i.e input (X),target (y) both numpy arrays for model training
@@ -55,17 +53,28 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
                             
         except KeyError:
             print("The specified dancer does not exist in the data")
-    
+            
     data = []
     for filename in set(include_files):
         keypoints = np.load(filename, allow_pickle=True)
         data.append(keypoints['arr_0'])
         
+
+        
     # create input and target data
     dataX, dataY = [], []
     for dataset in data:
+          
+        if not traj:
+            # substract hip trajectory every but at hip keypoint
+            dataset = np.array([np.concatenate(([x[0]], x[1:] - x[0])) for x in dataset])
+  
+            
         # reshape input to be [samples, features = (keypoints*3dim)] 
         dataset = np.reshape(dataset,  (dataset.shape[0], dataset.shape[1]*dataset.shape[2]))
+        
+            
+            
         for i in range(len(dataset) - look_back - target_length):
             # dataX has dimension [samples, lookback, features = (keypoints*3dim)] 
             a = dataset[i:(i + look_back), :]     
@@ -76,7 +85,7 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
     return np.array(dataX), np.array(dataY)
 
 
-def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3, temp=1.0, sigma_temp=0.0, look_back=10):
+def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3, temp=1.0, sigma_temp=0.0, look_back=10, traj=True):
     """Generates aperformance
     
     Args:
@@ -87,6 +96,8 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
       temp: the temperature for sampling between mixture components 
       sigma_temp: the temperature for sampling from the normal distribution
       look_back: number of poses the model takes as input
+      traj: if False, adds the hip trajectory to all other keypoints but the hip 
+           (this reverses the manipulation done in get_training_data() when flag traj=False is set)
     Returns: 
       numpy array with generated pose sequence"""
     time = 0
@@ -101,6 +112,10 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
         
     #reshape performance array
     performance = np.reshape(performance,(np.shape(performance)[0],17,3))
+    
+    if not traj:
+        performance = np.array([np.concatenate(([x[0]], x[1:] + x[0])) for x in performance])
+        
     return np.array(performance)
 
 def save_seq_to_json(performance, filename, path_base_dir=os.path.abspath("./")):
