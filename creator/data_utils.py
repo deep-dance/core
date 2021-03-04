@@ -2,6 +2,8 @@ import os
 import numpy as np
 import json
 import mdn
+from tensorflow_probability import distributions as tfd
+import tensorflow as tf
 
 
 # get motion_db file structure
@@ -11,10 +13,36 @@ dancers = [dancer for dancer in next(os.walk(basedir))[1]]
 for dancer in dancers:
     motion_db[dancer] = [folder for folder in next(os.walk(basedir + dancer))[1]]
     
+#bone segments of sceleton 
+bones = [
+    # Right leg
+    (0, 1),
+    (1, 2),
+    (2, 3),
+    # Left leg
+    (0, 4),
+    (4, 5),
+    (5, 6),
+    # Torso
+    (0, 7),
+    (7, 8),
+    # Head
+    (8, 9),
+    (9, 10),
+    # Right arm
+    (8, 14),
+    (14, 15),
+    (15, 16),
+    # Left arm
+    (8, 11),
+    (11, 12),
+    (12, 13),
+]
+    
 #get all tags 
 all_tags = set([tag for folderlist in motion_db.values() for folder in folderlist for tag in folder.split("_")])
 
-def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True):
+def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True, normalize_z = True):
     """loads data 
     
     Args:
@@ -57,7 +85,11 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
     data = []
     for filename in set(include_files):
         keypoints = np.load(filename, allow_pickle=True)
-        data.append(keypoints['arr_0'])
+        frames = keypoints['arr_0']
+        if normalize_z:
+            #substract mean from z axis
+            frames = np.concatenate((frames[:,:,:2],frames[:,:,2:]-np.mean(np.min(frames[:,:,2], axis=1))), axis=2)
+        data.append(frames)
         
 
         
@@ -81,6 +113,7 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
             dataX.append(a)
             # dataY has dimension [samples, features = (keypoints*3dim)] 
             dataY.append(dataset[i + look_back : i + look_back + target_length, :])
+     
             
     return np.array(dataX), np.array(dataY)
 
@@ -147,3 +180,71 @@ def save_seq_to_json(performance, filename, path_base_dir=os.path.abspath("./"))
         frameIdx += 1
     with open(os.path.join(path_base_dir, filename), 'w') as outfile:
         json.dump(jsonData, outfile)
+        
+        
+        
+        
+
+
+def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0, floor_err_weight=1.0, traj = False, tfsegs=None):
+    """Construct a  custom loss function for the MDN layer parametrised by number of mixtures.
+       Additionally a penalty is added if the segment length deviates from the average segment length in the training data"""
+    
+    # average segment length of all training data
+    if tfsegs is None:
+        tfsegs = tf.constant([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
+           0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
+           0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
+           0.1993194 ])
+    
+    # Construct a loss function with the right number of mixtures and outputs
+    def mdn_new_loss_func(y_true, y_pred):
+        # Reshape inputs in case this is used in a TimeDistribued layer
+
+        y_pred = tf.reshape(y_pred, [-1, (2 * num_mixes * output_dim) + num_mixes], name='reshape_ypreds')
+        y_true = tf.reshape(y_true, [-1, output_dim], name='reshape_ytrue')
+        # Split the inputs into paramaters
+        out_mu, out_sigma, out_pi = tf.split(y_pred, num_or_size_splits=[num_mixes * output_dim,
+                                                                         num_mixes * output_dim,
+                                                                         num_mixes],
+                                             axis=-1, name='mdn_coef_split')
+
+        # Construct the mixture models
+        cat = tfd.Categorical(logits=out_pi)
+        component_splits = [output_dim] * num_mixes
+        mus = tf.split(out_mu, num_or_size_splits=component_splits, axis=1)
+        sigs = tf.split(out_sigma, num_or_size_splits=component_splits, axis=1)
+        coll = [tfd.MultivariateNormalDiag(loc=loc, scale_diag=scale) for loc, scale
+                in zip(mus, sigs)]
+        mixture = tfd.Mixture(cat=cat, components=coll)
+        
+        #part 1: negative entropy of model prediction
+        loss = mixture.log_prob(y_true)
+        loss = tf.negative(loss)
+        loss = tf.reduce_mean(loss)
+        
+        #part 2: error from segment lengths 
+        # calculate means for keypoints
+        kp_predicted_means = mixture.mean()
+        kp_predicted_means = tf.reshape(kp_predicted_means, [-1,17,3])
+        if not traj:
+            t1 = kp_predicted_means[:,:1,:]
+            t2 = kp_predicted_means[:,1:,:] + t1
+            kp_predicted_means = tf.concat([t1, t2], 1)
+        # calculate average segment lengths       
+        segments = tf.map_fn(fn=lambda el: tf.convert_to_tensor([el[bone[1]]-el[bone[0]] for bone in bones]),
+                                 elems=kp_predicted_means, fn_output_signature = tf.TensorSpec((16,3), tf.float32))
+        segment_lengths = tf.math.reduce_euclidean_norm(segments, 2)
+        loss_segs_len_err = segs_loss_weight*tf.math.reduce_euclidean_norm(segment_lengths - tfsegs,1)
+        loss_segs_len_err = tf.reduce_mean(loss_segs_len_err)
+        
+        #part3: penalty for leaving the ground
+        loss_floor_err = tf.reduce_min(kp_predicted_means[:,:,2], axis=1)
+        loss_floor_err = floor_err_weight*tf.math.reduce_euclidean_norm(loss_floor_err)
+        #add losses
+        loss = loss + loss_segs_len_err + loss_floor_err
+        return loss
+
+    # Actually return the loss function
+    with tf.name_scope('MDN'):
+        return mdn_new_loss_func
