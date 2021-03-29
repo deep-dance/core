@@ -165,6 +165,62 @@ python predict_3d_pose.py
 
 ### Work for me: The Creator
 
+#### Train model
+
+The workflow is using [DVC pipelines](https://dvc.org/doc/start/data-pipelines). All stages are included in `dvc.yaml`. **Note:** everything needs to happen in the Tensorflow Docker container.
+
+The stage **prepare** was added issuing this:
+
+```
+dvc run -n prepare \
+    -p prepare.split,prepare.look_back \
+    -d src/prepare.py \
+    -o ../data/train/prepared \
+    python src/prepare.py
+```
+
+The stage **train** was added issuing this:
+
+```
+dvc run -n train \
+    -p train.data,train.epochs,train.batch_size,train.look_back,train.lstm_layer,train.mdn_layer,train.custom_loss \
+    -d src/train.py \
+    -M ../data/metrics/deep-dance-scores.json \
+    --plots-no-cache ../data/metrics/deep-dance-loss.json \
+    -o ../data/models \
+    -o ../data/metrics \
+    python src/train.py
+```
+
+The stage **generate** was added issuing this:
+
+```
+dvc run -n generate \
+    -p generate.seed,generate.steps_limit,generate.random_state,generate.look_back,generate.custom_loss \
+    -d src/generate.py \
+    -o ../data/generated \
+    python src/generate.py
+```
+
+There's no need to use dvc add for DVC to track stage outputs (`../data/train/prepared/models` in this case); `dvc run` already took care of this. You only need to run `dvc push` if you want to save them to remote storage, (usually along with `git commit` to version `dvc.yaml` itself).
+
+##### Experiments
+
+`dvc run exp` needs a working Git config (because it could also push results to a Git remote directly). Therefor it is necessary to set a username and an email:
+
+```
+git config --global user.name "username"
+git config --global user.email "username@mail.me"
+```
+
+###### Troubleshooting
+
+1. `cannot stash changes - there is nothing to stash.`
+
+One small workaround I have for this at the moment is make a small change to any file that is under git version control (but not related to any of the stages,etc). See issue (here)[https://github.com/iterative/dvc/issues/5684].
+
+##### Debugging
+
 #### Simple matplot rendering
 ```
 python3.6 render_pose3d_matplot.py ../data/train/seq_001/pose3d.npz --frames 90
