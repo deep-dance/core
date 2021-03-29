@@ -42,7 +42,10 @@ bones = [
 #get all tags 
 all_tags = set([tag for folderlist in motion_db.values() for folder in folderlist for tag in folder.split("_")])
 
-def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True, normalize_z = True):
+def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True, normalize_z = True, normalize_body=False, body_segements = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
+        0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
+        0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
+        0.1993194 ])):
     """loads data 
     
     Args:
@@ -57,6 +60,7 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
       X,y i.e input (X),target (y) both numpy arrays for model training
     
     """
+    print("getTragingsData",str(normalize_body)) 
     # default gets the data of all dancers
     if dancers is "all":
         dancers = list(motion_db.keys())
@@ -100,13 +104,19 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
         if not traj:
             # substract hip trajectory every but at hip keypoint
             dataset = np.array([np.concatenate(([x[0]], x[1:] - x[0])) for x in dataset])
-  
+            
+            #rescale pose to a predefined body size
+        if normalize_body:
+            print("Normalize")
+            rescaled_dataset = []
+            for pose in dataset:
+                pose = normalize_pose(pose, body_segements)
+                rescaled_dataset.append(pose)
+            dataset = np.asarray(rescaled_dataset)
             
         # reshape input to be [samples, features = (keypoints*3dim)] 
         dataset = np.reshape(dataset,  (dataset.shape[0], dataset.shape[1]*dataset.shape[2]))
-        
-            
-            
+                    
         for i in range(len(dataset) - look_back - target_length):
             # dataX has dimension [samples, lookback, features = (keypoints*3dim)] 
             a = dataset[i:(i + look_back), :]     
@@ -117,8 +127,24 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
             
     return np.array(dataX), np.array(dataY)
 
+def normalize_pose(pose, body_segements):
+    p = pose.reshape((17,3))
+    count = 0
+    new_pose = np.zeros((17,3))
+    new_pose[0] = p[0]
+    for bone in bones:
+        #print("count, bone, p[bone[0]]", count, bone, p[bone[0]])
+        direction = np.subtract(p[bone[1]], p[bone[0]])
+        direction = direction / np.sqrt(np.sum(direction**2))
+        new_pose[bone[1]] = new_pose[bone[0]] + direction * body_segements[count]
+        count += 1
+        
+    return new_pose
 
-def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3, temp=1.0, sigma_temp=0.0, look_back=10, traj=True):
+def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3, temp=1.0, sigma_temp=0.0, look_back=10, traj=True, post_rescale=False,body_segements = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
+        0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
+        0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
+        0.1993194 ])):
     """Generates aperformance
     
     Args:
@@ -133,6 +159,7 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
            (this reverses the manipulation done in get_training_data() when flag traj=False is set)
     Returns: 
       numpy array with generated pose sequence"""
+
     time = 0
     steps = 0
     performance = [pose for pose in initial_positions]
@@ -140,14 +167,19 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
         params = model.predict(np.expand_dims(np.array(performance[-look_back:]), axis=0))
         new_poses = mdn.sample_from_output(params[0], 51, n_mixtures, temp=temp, sigma_temp=sigma_temp)
         for pose in new_poses:
+            if not traj:
+                posen = np.concatenate(([pose[0]], pose[1:] + pose[0])) 
+            if post_rescale:
+                pose = normalize_pose(pose, body_segements)
+                pose = pose.reshape((51))
             performance.append(pose)
         steps += len(new_poses)
         
     #reshape performance array
     performance = np.reshape(performance,(np.shape(performance)[0],17,3))
     
-    if not traj:
-        performance = np.array([np.concatenate(([x[0]], x[1:] + x[0])) for x in performance])
+    #if not traj:
+        #performance = np.array([np.concatenate(([x[0]], x[1:] + x[0])) for x in performance])
         
     return np.array(performance)
 
@@ -186,7 +218,7 @@ def save_seq_to_json(performance, filename, path_base_dir=os.path.abspath("./"))
         
 
 
-def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0, floor_err_weight=1.0, traj = False, tfsegs=None):
+def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0, floor_err= False, floor_err_weight=1.0, traj = False, tfsegs=None):
     """Construct a  custom loss function for the MDN layer parametrised by number of mixtures.
        Additionally a penalty is added if the segment length deviates from the average segment length in the training data"""
     
@@ -237,12 +269,15 @@ def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0, floor_
         segment_lengths = tf.math.reduce_euclidean_norm(segments, 2)
         loss_segs_len_err = segs_loss_weight*tf.math.reduce_euclidean_norm(segment_lengths - tfsegs,1)
         loss_segs_len_err = tf.reduce_mean(loss_segs_len_err)
+        loss = loss + loss_segs_len_err
         
-        #part3: penalty for leaving the ground
-        loss_floor_err = tf.reduce_min(kp_predicted_means[:,:,2], axis=1)
-        loss_floor_err = floor_err_weight*tf.math.reduce_euclidean_norm(loss_floor_err)
-        #add losses
-        loss = loss + loss_segs_len_err + loss_floor_err
+        if floor_err:
+            #part3: penalty for leaving the ground
+            loss_floor_err = tf.reduce_min(kp_predicted_means[:,:,2], axis=1)
+            loss_floor_err = floor_err_weight*tf.math.reduce_euclidean_norm(loss_floor_err)
+            #add losses
+            loss = loss +  loss_floor_err
+            
         return loss
 
     # Actually return the loss function
