@@ -42,7 +42,7 @@ bones = [
 #get all tags 
 all_tags = set([tag for folderlist in motion_db.values() for folder in folderlist for tag in folder.split("_")])
 
-def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True, normalize_z = True, normalize_body=False, body_segements = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
+def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True, normalize_z = True, normalize_body=False, body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
         0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
         0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
         0.1993194 ])):
@@ -55,6 +55,8 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
       lookback: int, length of pose sequences in which data is cut for input into the model
       target_lenght: int, length of target poses the model is supposed to predict
       traj: if False, subtracts the hip trajectory from all other keypoints but not from the hip itself
+      normalize_body: if True, rescals pose to a predefined body size, given in body_segments
+      body_segments: if normalize_body is True, pose is rescaled according to these segment lenghts
 
     Returns:
       X,y i.e input (X),target (y) both numpy arrays for model training
@@ -100,20 +102,21 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
     # create input and target data
     dataX, dataY = [], []
     for dataset in data:
-          
-        if not traj:
-            # substract hip trajectory every but at hip keypoint
-            dataset = np.array([np.concatenate(([x[0]], x[1:] - x[0])) for x in dataset])
-            
-            #rescale pose to a predefined body size
+        
+                    
+        #rescale pose to a predefined body size
         if normalize_body:
             print("Normalize")
             rescaled_dataset = []
             for pose in dataset:
-                pose = normalize_pose(pose, body_segements)
+                pose = normalize_pose(pose, body_segments)
                 rescaled_dataset.append(pose)
             dataset = np.asarray(rescaled_dataset)
-            
+          
+        if not traj:
+            # substract hip trajectory every but at hip keypoint
+            dataset = np.array([np.concatenate(([x[0]], x[1:] - x[0])) for x in dataset])
+         
         # reshape input to be [samples, features = (keypoints*3dim)] 
         dataset = np.reshape(dataset,  (dataset.shape[0], dataset.shape[1]*dataset.shape[2]))
                     
@@ -127,7 +130,7 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
             
     return np.array(dataX), np.array(dataY)
 
-def normalize_pose(pose, body_segements):
+def normalize_pose(pose, body_segments):
     p = pose.reshape((17,3))
     count = 0
     new_pose = np.zeros((17,3))
@@ -136,12 +139,12 @@ def normalize_pose(pose, body_segements):
         #print("count, bone, p[bone[0]]", count, bone, p[bone[0]])
         direction = np.subtract(p[bone[1]], p[bone[0]])
         direction = direction / np.sqrt(np.sum(direction**2))
-        new_pose[bone[1]] = new_pose[bone[0]] + direction * body_segements[count]
+        new_pose[bone[1]] = new_pose[bone[0]] + direction * body_segments[count]
         count += 1
         
     return new_pose
 
-def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3, temp=1.0, sigma_temp=0.0, look_back=10, traj=True, post_rescale=False,body_segements = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
+def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3, temp=1.0, sigma_temp=0.0, look_back=10, traj=True, post_rescale=False,body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
         0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
         0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
         0.1993194 ])):
@@ -170,7 +173,7 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
             if not traj:
                 posen = np.concatenate(([pose[0]], pose[1:] + pose[0])) 
             if post_rescale:
-                pose = normalize_pose(pose, body_segements)
+                pose = normalize_pose(pose, body_segments)
                 pose = pose.reshape((51))
             performance.append(pose)
         steps += len(new_poses)
