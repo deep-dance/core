@@ -5,12 +5,12 @@ prepare:
 
 train:
   data: all
-  epochs: 1
+  epochs: 10
   batch_size: 128
   look_back: 10
-  lstm_layer: 32
+  lstm_layer: 128
   mdn_layer: 3
-  custom_loss: True
+  custom_loss: true
   random_state: 42
 
 generate:
@@ -18,4 +18,4 @@ generate:
   random_state: 42
   seed: 1500
   steps_limit: 1500
-  custom_loss: True
+  custom_loss: true
