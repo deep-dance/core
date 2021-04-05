@@ -11,27 +11,27 @@ stages:
         train.batch_size: 128
         train.custom_loss: true
         train.data: all
-        train.epochs: 1
+        train.epochs: 10
         train.look_back: 10
-        train.lstm_layer: 32
+        train.lstm_layer: 64
         train.mdn_layer: 3
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 08ae3d5b423e7652abc364616249176e
-      size: 126
+      md5: 9d94383c06379bae9b7a494c664aadba
+      size: 1077
     - path: ../data/metrics/deep-dance-scores.json
-      md5: c7c00fd067098d40ab5684707f8f814d
+      md5: d9e4c85bc568f56680fd55ec6bd53173
       size: 78
     - path: ../data/models
-      md5: c9284db1956eb294d7ab151f85178a3f.dir
-      size: 535704
+      md5: d4dcfcd685c3b10ab7068f37f80340e7.dir
+      size: 1513940
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: c9284db1956eb294d7ab151f85178a3f.dir
-      size: 535704
+      md5: d4dcfcd685c3b10ab7068f37f80340e7.dir
+      size: 1513940
       nfiles: 1
     - path: src/generate.py
       md5: b0128c019efb4bd1a0ff17ee4c554ac2
@@ -45,6 +45,6 @@ stages:
         generate.steps_limit: 1500
     outs:
     - path: ../data/generated
-      md5: 9485b74bb5b1bf875ad7568d9053c1d9.dir
-      size: 1627062
+      md5: 95fcdc5b39787b5d66dcb8bad811da65.dir
+      size: 1616836
       nfiles: 1
