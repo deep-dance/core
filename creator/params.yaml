@@ -7,15 +7,15 @@ train:
   data: all
   epochs: 1
   batch_size: 128
-  look_back: 10
+  look_back: 30
   lstm_layer: 32
   mdn_layer: 3
-  custom_loss: True
+  custom_loss: true
   random_state: 42
 
 generate:
-  look_back: 10
+  look_back: 30
   random_state: 42
   seed: 1500
   steps_limit: 1500
-  custom_loss: True
+  custom_loss: true
