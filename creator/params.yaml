@@ -2,9 +2,10 @@ prepare:
   look_back: 10
   split: 0.05
   random_state: 42
+  dancers: 'maria'
+  tags: 'impro'
 
 train:
-  data: all
   epochs: 1
   batch_size: 128
   look_back: 10
@@ -12,6 +13,8 @@ train:
   mdn_layer: 3
   custom_loss: True
   random_state: 42
+  dancers: 'maria'
+  tags: 'impro'
 
 generate:
   look_back: 10

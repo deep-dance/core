@@ -32,6 +32,8 @@ import os
 import argparse
 import yaml
 
+# Filter out INFO & WARNING messages
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
 import tensorflow as tf
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
@@ -49,7 +51,8 @@ def get_parser():
 
 if __name__ == '__main__':
     params = yaml.safe_load(open('params.yaml'))['train']
-    data = params['data']
+    dancers = params['dancers']
+    tags = params['tags']
     epochs = params['epochs']
     batch_size = params['batch_size']
     look_back = params['look_back']
@@ -62,8 +65,7 @@ if __name__ == '__main__':
     config = ConfigProto()
     config.gpu_options.allow_growth = True
     session = InteractiveSession(config=config)
-    tf.get_logger().setLevel('INFO')
-
+    
     print("Num GPUs Available: ", len(
         tf.config.experimental.list_physical_devices('GPU')))
 
@@ -80,7 +82,17 @@ if __name__ == '__main__':
 
     # TODO Remove after NPZ export fix
     print("Loading prepared data. This might take a while..")
-    x, y = get_training_data(look_back = look_back)
+
+    selected_dancers = dancers.split(',')
+    for d in selected_dancers:
+        d = d.strip()
+
+    selected_tags = tags.split(',')
+    for t in selected_tags:
+        t = d.strip()
+
+    x, y = get_training_data(dancers = selected_dancers, tags = selected_tags,
+        look_back = look_back)
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.05, shuffle= True, random_state=42)
 
