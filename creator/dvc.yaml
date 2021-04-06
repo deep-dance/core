@@ -6,11 +6,12 @@ stages:
     params:
     - train.batch_size
     - train.custom_loss
-    - train.data
     - train.epochs
     - train.look_back
     - train.lstm_layer
     - train.mdn_layer
+    - train.dancers
+    - train.tags
     outs:
     - ../data/models
     metrics:

@@ -62,13 +62,16 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
       X,y i.e input (X),target (y) both numpy arrays for model training
     
     """
-    print("getTragingsData",str(normalize_body)) 
+    print("Normalize body: ",str(normalize_body)) 
     # default gets the data of all dancers
-    if dancers is "all":
+
+    print("Getting data for dancers: ", dancers)
+    if 'all' in dancers:
         dancers = list(motion_db.keys())
         
     # default includes all tags
-    if tags == "all":
+    print("Getting data for tags: ", tags)
+    if 'all' in tags:
         tags = all_tags
     
     # collect all file names of relevant data
@@ -86,7 +89,7 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
                             include_files.append(basedir + dancer + "/" + folder_name + "/" + 'pose3d.npz')
                             
         except KeyError:
-            print("The specified dancer does not exist in the data")
+            print("The specified dancer does not exist in the data: ", dancer)
             
     data = []
     for filename in set(include_files):
