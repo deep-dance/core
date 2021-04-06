@@ -104,12 +104,6 @@ if __name__ == '__main__':
 
     print('Saving model and metrics...')
     model.save('../data/models/deep-dance.h5')
-
-    # HACK!
-    folder = 'model_' + str(look_back) + '_' + str(lstm_layer) + '_' + str(mdn_layer)
-    os.makedirs(os.path.join('../', 'data', folder), exist_ok=True)
-    model.save('../data/' + folder + '/deep-dance.h5')
-
     model.evaluate('../data/metrics/deep-dance-scores.json',
         '../data/metrics/deep-dance-loss.json')
     
