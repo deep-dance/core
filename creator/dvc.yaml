@@ -1,0 +1,34 @@
+stages:
+  train:
+    cmd: python src/train.py
+    deps:
+    - src/train.py
+    params:
+    - train.batch_size
+    - train.custom_loss
+    - train.data
+    - train.epochs
+    - train.look_back
+    - train.lstm_layer
+    - train.mdn_layer
+    outs:
+    - ../data/models
+    metrics:
+    - ../data/metrics/deep-dance-scores.json:
+        cache: false
+    plots:
+    - ../data/metrics/deep-dance-loss.json:
+        cache: false
+  generate:
+    cmd: python src/generate.py
+    deps:
+    - src/generate.py
+    - ../data/models
+    params:
+    - generate.custom_loss
+    - generate.look_back
+    - generate.random_state
+    - generate.seed
+    - generate.steps_limit
+    outs:
+    - ../data/generated

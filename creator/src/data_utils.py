@@ -233,7 +233,7 @@ def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0, floor_
            0.1993194 ])
     
     # Construct a loss function with the right number of mixtures and outputs
-    def mdn_new_loss_func(y_true, y_pred):
+    def mdn_loss_func(y_true, y_pred):
         # Reshape inputs in case this is used in a TimeDistribued layer
 
         y_pred = tf.reshape(y_pred, [-1, (2 * num_mixes * output_dim) + num_mixes], name='reshape_ypreds')
@@ -285,4 +285,4 @@ def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0, floor_
 
     # Actually return the loss function
     with tf.name_scope('MDN'):
-        return mdn_new_loss_func
+        return mdn_loss_func
