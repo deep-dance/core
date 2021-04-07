@@ -12,6 +12,7 @@ stages:
     - train.mdn_layer
     - train.dancers
     - train.tags
+    - train.validation_split
     outs:
     - ../data/models
     metrics:
@@ -31,5 +32,6 @@ stages:
     - generate.random_state
     - generate.seed
     - generate.steps_limit
+    - generate.validation_split
     outs:
     - ../data/generated

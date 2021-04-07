@@ -17,6 +17,8 @@ import os
 import argparse
 import yaml
 
+# Filter out INFO & WARNING messages
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
 import tensorflow as tf
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
@@ -36,6 +38,7 @@ if __name__ == '__main__':
     look_back = params['look_back']
     random_state = params['random_state']
     custom_loss = params['custom_loss']
+    validation_split = params['validation_split']
 
     args = get_parser().parse_args()
 
@@ -52,7 +55,7 @@ if __name__ == '__main__':
     print("Loading prepared data. This might take a while..")
     x, y = get_training_data(look_back = look_back)
     x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=0.05, shuffle=True, random_state=random_state)
+        x, y, test_size=validation_split, shuffle=True, random_state=random_state)
 
     os.makedirs(os.path.join('../', 'data', 'generated'), exist_ok=True)
 

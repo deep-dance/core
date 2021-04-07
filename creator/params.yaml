@@ -15,6 +15,7 @@ train:
   random_state: 42
   dancers: 'maria'
   tags: 'impro'
+  validation_split: 0.7
 
 generate:
   look_back: 10
@@ -22,3 +23,4 @@ generate:
   seed: 1500
   steps_limit: 1500
   custom_loss: True
+  validation_split: 0.7
