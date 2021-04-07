@@ -24,14 +24,13 @@ command = 'dvc exp run --queue \
 -S train.lstm_layer={3} \
 -S train.mdn_layer={4} \
 -S train.dancers={5} \
--S train.tags={6} \
--S generate.look_back={7}'
+-S generate.look_back={6} \
+-S generate.dancers={7}'
 
 def run_exp_suite_01(call = False):
-    dancers = 'girish,maria,mark,marlen,raymond,tinyeung'
-    tags = 'impro'
+    dancers = 'all'
     for batch_size in [32]:
-        for look_back in [10, 100]:
+        for look_back in [100, 10]:
             for lstm_layer in [32, 64, 128]:
                 for mdn_layer in [2, 3, 5]:
                     sh_command = command.format(
@@ -41,13 +40,14 @@ def run_exp_suite_01(call = False):
                         lstm_layer,
                         mdn_layer,
                         dancers,
-                        tags,
-                        look_back)
+                        look_back,
+                        dancers)
                     print(sh_command)
                     if call:
                         stream = os.popen(sh_command)
                         output = stream.read()
                         output
+                print('dvc exp run --run-all --jobs 1')
 
 run_exp_suite_01()
 

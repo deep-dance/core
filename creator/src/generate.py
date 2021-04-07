@@ -33,12 +33,15 @@ def get_parser():
 
 if __name__ == '__main__':
     params = yaml.safe_load(open('params.yaml'))['generate']
+    dancers = params['dancers']
+    tags = params['tags']
     seed = params['seed']
     steps_limit = params['steps_limit']
     look_back = params['look_back']
     random_state = params['random_state']
     custom_loss = params['custom_loss']
     validation_split = params['validation_split']
+    test_size = params['test_size']
 
     args = get_parser().parse_args()
 
@@ -53,9 +56,19 @@ if __name__ == '__main__':
 
     # TODO Remove after NPZ export fix
     print("Loading prepared data. This might take a while..")
-    x, y = get_training_data(look_back = look_back)
+    # x, y = get_training_data(look_back = look_back)
+    selected_dancers = dancers.split(',')
+    for d in selected_dancers:
+        d = d.strip()
+
+    selected_tags = tags.split(',')
+    for t in selected_tags:
+        t = d.strip()
+
+    x, y = get_training_data(dancers = selected_dancers, tags = selected_tags,
+        look_back = look_back)
     x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=validation_split, shuffle=True, random_state=random_state)
+        x, y, test_size=test_size, shuffle=True, random_state=random_state)
 
     os.makedirs(os.path.join('../', 'data', 'generated'), exist_ok=True)
 

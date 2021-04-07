@@ -60,6 +60,7 @@ if __name__ == '__main__':
     mdn_layer = params['mdn_layer']
     custom_loss = params['custom_loss']
     validation_split = params['validation_split']
+    test_size = params['test_size']
 
     args = get_parser().parse_args()
 
@@ -95,7 +96,7 @@ if __name__ == '__main__':
     x, y = get_training_data(dancers = selected_dancers, tags = selected_tags,
         look_back = look_back)
     x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=validation_split, shuffle= True, random_state=42)
+        x, y, test_size=test_size, shuffle= True, random_state=42)
 
     print("Data shape(s):")
     print("x: ", np.shape(x_train))
@@ -112,7 +113,8 @@ if __name__ == '__main__':
 
     model = DeepDanceModel(
         look_back = look_back, lstm_layers = lstm_layer,
-        mdn_layers = mdn_layer, custom_loss=custom_loss)
+        mdn_layers = mdn_layer, validation_split = validation_split,
+        custom_loss = custom_loss)
     model.train(x, y, epochs = epochs, batch_size = batch_size)
 
     print('Saving model and metrics...')
