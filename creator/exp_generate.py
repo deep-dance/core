@@ -28,7 +28,7 @@ command = 'dvc exp run --queue \
 -S generate.look_back={7}'
 
 def run_exp_suite_01(call = False):
-    dancers = 'all'
+    dancers = 'girish,maria,mark,marlen,raymond,tinyeung'
     tags = 'impro'
     for batch_size in [32]:
         for look_back in [10, 100]:
