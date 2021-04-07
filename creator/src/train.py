@@ -59,6 +59,7 @@ if __name__ == '__main__':
     lstm_layer = params['lstm_layer']
     mdn_layer = params['mdn_layer']
     custom_loss = params['custom_loss']
+    validation_split = params['validation_split']
 
     args = get_parser().parse_args()
 
@@ -94,7 +95,7 @@ if __name__ == '__main__':
     x, y = get_training_data(dancers = selected_dancers, tags = selected_tags,
         look_back = look_back)
     x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=0.05, shuffle= True, random_state=42)
+        x, y, test_size=validation_split, shuffle= True, random_state=42)
 
     print("Data shape(s):")
     print("x: ", np.shape(x_train))

@@ -4,8 +4,8 @@ stages:
     cmd: python src/train.py
     deps:
     - path: src/train.py
-      md5: f8a8ad94b3027ab0184e5058e5eff8bc
-      size: 4046
+      md5: 02335565db7f658fd2e4dd3c6c3cf743
+      size: 4108
     params:
       params.yaml:
         train.batch_size: 128
@@ -16,15 +16,16 @@ stages:
         train.lstm_layer: 32
         train.mdn_layer: 3
         train.tags: impro
+        train.validation_split: 0.7
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: dacd24b73602e7c4342c397811dbb423
-      size: 126
+      md5: 13dc782f07133da6903e55d6b475bc67
+      size: 128
     - path: ../data/metrics/deep-dance-scores.json
-      md5: 4d3bb98bce708f4668d3639a6d73d3d7
-      size: 78
+      md5: 2e6574f2d78111cc86cac591f409438b
+      size: 80
     - path: ../data/models
-      md5: 70be98e833d4e6a3617faf798247a601.dir
+      md5: e5883246f4f38a059485d6f6472b9555.dir
       size: 535704
       nfiles: 1
   generate:
