@@ -6,11 +6,11 @@ stages:
     params:
     - train.batch_size
     - train.custom_loss
+    - train.dancers
     - train.epochs
     - train.look_back
     - train.lstm_layer
     - train.mdn_layer
-    - train.dancers
     - train.tags
     - train.validation_split
     outs:
@@ -21,6 +21,7 @@ stages:
     plots:
     - ../data/metrics/deep-dance-loss.json:
         cache: false
+        y: loss
   generate:
     cmd: python src/generate.py
     deps:
