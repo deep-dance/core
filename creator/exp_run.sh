@@ -12,6 +12,7 @@
 # --------------------------
 # Queue up experiments. Please see 'exp_generate.py' on how to generate these DVC calls.
 # --------------------------
+
 dvc exp run --queue -S train.epochs=10 -S train.batch_size=32 -S train.look_back=70 -S train.lstm_layer=32 -S train.mdn_layer=2 -S train.dancers=all -S generate.look_back=70 -S generate.dancers=all
 dvc exp run --queue -S train.epochs=10 -S train.batch_size=32 -S train.look_back=70 -S train.lstm_layer=32 -S train.mdn_layer=3 -S train.dancers=all -S generate.look_back=70 -S generate.dancers=all
 dvc exp run --queue -S train.epochs=10 -S train.batch_size=32 -S train.look_back=70 -S train.lstm_layer=32 -S train.mdn_layer=5 -S train.dancers=all -S generate.look_back=70 -S generate.dancers=all
