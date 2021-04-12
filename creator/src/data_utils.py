@@ -173,19 +173,16 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
         params = model.predict(np.expand_dims(np.array(performance[-look_back:]), axis=0))
         new_poses = mdn.sample_from_output(params[0], 51, n_mixtures, temp=temp, sigma_temp=sigma_temp)
         for pose in new_poses:
-            if not traj:
-                posen = np.concatenate(([pose[0]], pose[1:] + pose[0])) 
-            if post_rescale:
-                pose = normalize_pose(pose, body_segments)
-                pose = pose.reshape((51))
             performance.append(pose)
         steps += len(new_poses)
         
     #reshape performance array
     performance = np.reshape(performance,(np.shape(performance)[0],17,3))
     
-    #if not traj:
-        #performance = np.array([np.concatenate(([x[0]], x[1:] + x[0])) for x in performance])
+    if not traj:
+        performance = np.array([np.concatenate(([pose[0]], pose[1:] + pose[0])) for pose in performance])    
+    if post_rescale:
+        performance = np.array([normalize_pose(pose, body_segments) for pose in performance])
         
     return np.array(performance)
 
