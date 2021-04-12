@@ -35,13 +35,20 @@ if __name__ == '__main__':
     params = yaml.safe_load(open('params.yaml'))['generate']
     dancers = params['dancers']
     tags = params['tags']
+    
+    random_state = params['random_state']
+    test_size = params['test_size']
+    validation_split = params['validation_split']
+    look_back = params['look_back']
+    normalize_body = params['normalize_body']
+    hip_correction = params['hip_correction']
+    
     seed = params['seed']
     steps_limit = params['steps_limit']
-    look_back = params['look_back']
-    random_state = params['random_state']
-    custom_loss = params['custom_loss']
-    validation_split = params['validation_split']
-    test_size = params['test_size']
+    temperature = params['temperature']
+    rescale_process = params['rescale_process']
+    rescale_post = params['rescale_post']
+    
 
     args = get_parser().parse_args()
 
@@ -56,28 +63,24 @@ if __name__ == '__main__':
 
     # TODO Remove after NPZ export fix
     print("Loading prepared data. This might take a while..")
-    # x, y = get_training_data(look_back = look_back)
-    selected_dancers = dancers.split(',')
-    for d in selected_dancers:
-        d = d.strip()
 
-    selected_tags = tags.split(',')
-    for t in selected_tags:
-        t = d.strip()
+    selected_dancers = stringlist_to_array(dancers)
+    selected_tags = stringlist_to_array(tags)
 
-    x, y = get_training_data(dancers = selected_dancers, tags = selected_tags,
-        look_back = look_back)
+    x, y = get_training_data(dancers=selected_dancers, tags=selected_tags,
+        look_back=look_back, normalize_body=normalize_body, hip_correction=hip_correction)
+        
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=test_size, shuffle=True, random_state=random_state)
 
     os.makedirs(os.path.join('../', 'data', 'generated'), exist_ok=True)
 
-    model = DeepDanceModel(custom_loss=custom_loss)
+    model = DeepDanceModel(custom_loss=True)
     model.load('../data/models/deep-dance.h5')
 
     print('Generating sequences...')
     model.generate('../data/generated/deep-dance-seq.json', x_test,
-        seed, steps_limit)
+        seed, steps_limit, hip_correction, temperature, rescale_process, rescale_post)
 
     
     

@@ -4,50 +4,60 @@ stages:
     cmd: python src/train.py
     deps:
     - path: src/train.py
-      md5: afe44f9001ad3e56cfd8aa9441fa092d
-      size: 4184
+      md5: 1160d6f908e1d460f1a3c7181903cfc9
+      size: 4166
     params:
       params.yaml:
         train.batch_size: 32
-        train.custom_loss: true
         train.dancers: maria
         train.epochs: 1
+        train.hip_correction: false
         train.look_back: 10
         train.lstm_layer: 32
         train.mdn_layer: 3
+        train.normalize_body: true
+        train.random_state: 42
         train.tags: impro
-        train.validation_split: 0.8
+        train.test_size: 0.05
+        train.validation_split: 0.1
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 2155ee8a3302a9b2f84205c3d116bc1e
-      size: 127
+      md5: b29447bdcfa843a7066da3fdf6d4f145
+      size: 129
     - path: ../data/metrics/deep-dance-scores.json
-      md5: c33ecdbd0a9d444e04ce4f8c2b973272
-      size: 79
+      md5: 331475e9bb6a977bdf0fbeaac681c170
+      size: 81
     - path: ../data/models
-      md5: 1c45a89bf8ac228f24d996b04b3744dc.dir
+      md5: d8f75972d2000ae08d43797b0c642048.dir
       size: 535704
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: 9024a2e0efc48d91e7a4ca82a71ad2fe.dir
+      md5: d8f75972d2000ae08d43797b0c642048.dir
       size: 535704
       nfiles: 1
     - path: src/generate.py
-      md5: 923a628ff5fcbaed9e01f35f397ebb27
-      size: 2816
+      md5: 921cecc5a091f46de98016935e73b412
+      size: 2994
     params:
       params.yaml:
-        generate.custom_loss: true
+        generate.dancers: maria
+        generate.hip_correction: false
         generate.look_back: 10
+        generate.normalize_body: true
         generate.random_state: 42
+        generate.rescale_post: false
+        generate.rescale_process: true
         generate.seed: 1500
         generate.steps_limit: 1500
-        generate.validation_split: 0.7
+        generate.tags: impro
+        generate.temperature: 1.0
+        generate.test_size: 0.05
+        generate.validation_split: 0.1
     outs:
     - path: ../data/generated
-      md5: 9d3d915de708ebaeb2521fe7847e8306.dir
-      size: 1620568
+      md5: 0866e573eb61dbc35baf8e0f182a3fcb.dir
+      size: 1639445
       nfiles: 1

@@ -38,8 +38,8 @@ class DeepDanceModel:
     
     def __init__(
             self,
-            look_back = 10, lstm_layers = 32,
-            mdn_layers = 3, validation_split = 0.10, custom_loss = False):
+            look_back=10, lstm_layers=32,
+            mdn_layers=3, validation_split=0.10, custom_loss=True):
         self.look_back = look_back
         self.mdn_layers = mdn_layers
         self.custom_loss = custom_loss
@@ -65,7 +65,7 @@ class DeepDanceModel:
             optimizer=keras.optimizers.Adam())
         self.model.summary()
 
-    def train(self, x = {}, y = {}, epochs = 10, batch_size = 128):
+    def train(self, x={}, y={}, epochs=10, batch_size=32):
         # Define callbacks
         early_stopping = keras.callbacks.EarlyStopping(
             monitor = 'val_loss', mode = 'min', verbose = 1, patience = 10)
@@ -93,9 +93,12 @@ class DeepDanceModel:
     def save(self, filename):
         self.model.save(filename)
 
-    def generate(self, filename, x_test, seed, steps_limit):
+    def generate(self, filename, x_test, seed, steps_limit, hip_correction=True,
+        temperature=1.0, rescale_post=False, rescale_process=False):
         performance = generate_performance(
-            self.model, x_test[seed], steps_limit=steps_limit, traj=False)
+            self.model, x_test[seed], steps_limit=steps_limit,
+            hip_correction=hip_correction, temp=temperature,
+            rescale_post=rescale_post, rescale_process=rescale_process)
         save_seq_to_json(performance, filename)
 
     def evaluate(self, file_scores, file_loss):

@@ -53,12 +53,13 @@ if __name__ == '__main__':
     params = yaml.safe_load(open('params.yaml'))['train']
     dancers = params['dancers']
     tags = params['tags']
+    random_state = params['random_state']
     epochs = params['epochs']
     batch_size = params['batch_size']
     look_back = params['look_back']
     lstm_layer = params['lstm_layer']
     mdn_layer = params['mdn_layer']
-    custom_loss = params['custom_loss']
+    normalize_body = params['normalize_body']
     validation_split = params['validation_split']
     test_size = params['test_size']
 
@@ -85,18 +86,14 @@ if __name__ == '__main__':
     # TODO Remove after NPZ export fix
     print("Loading prepared data. This might take a while..")
 
-    selected_dancers = dancers.split(',')
-    for d in selected_dancers:
-        d = d.strip()
+    selected_dancers = stringlist_to_array(dancers)
+    selected_tags = stringlist_to_array(tags)
 
-    selected_tags = tags.split(',')
-    for t in selected_tags:
-        t = d.strip()
-
-    x, y = get_training_data(dancers = selected_dancers, tags = selected_tags,
-        look_back = look_back)
-    x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=test_size, shuffle= True, random_state=42)
+    x, y = get_training_data(dancers=selected_dancers, tags=selected_tags,
+        look_back=look_back, normalize_body=normalize_body)
+    
+    x_train, x_test, y_train, y_test=train_test_split(
+        x, y, test_size=test_size, shuffle=True, random_state=random_state)
 
     print("Data shape(s):")
     print("x: ", np.shape(x_train))
@@ -112,10 +109,10 @@ if __name__ == '__main__':
  
 
     model = DeepDanceModel(
-        look_back = look_back, lstm_layers = lstm_layer,
-        mdn_layers = mdn_layer, validation_split = validation_split,
-        custom_loss = custom_loss)
-    model.train(x, y, epochs = epochs, batch_size = batch_size)
+        look_back=look_back, lstm_layers=lstm_layer,
+        mdn_layers=mdn_layer, validation_split=validation_split,
+        custom_loss=True)
+    model.train(x, y, epochs = epochs, batch_size=batch_size)
 
     print('Saving model and metrics...')
     model.save('../data/models/deep-dance.h5')

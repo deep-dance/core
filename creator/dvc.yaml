@@ -4,15 +4,18 @@ stages:
     deps:
     - src/train.py
     params:
-    - train.batch_size
-    - train.custom_loss
-    - train.epochs
-    - train.look_back
-    - train.lstm_layer
-    - train.mdn_layer
     - train.dancers
     - train.tags
+    - train.random_state
+    - train.test_size
     - train.validation_split
+    - train.look_back
+    - train.normalize_body
+    - train.hip_correction
+    - train.batch_size
+    - train.epochs
+    - train.lstm_layer
+    - train.mdn_layer
     outs:
     - ../data/models
     metrics:
@@ -27,11 +30,21 @@ stages:
     - src/generate.py
     - ../data/models
     params:
-    - generate.custom_loss
-    - generate.look_back
+    - generate.dancers
+    - generate.tags
     - generate.random_state
+    - generate.test_size
+    - generate.validation_split
+    - generate.look_back
+    - generate.normalize_body
+    - generate.hip_correction
+
     - generate.seed
     - generate.steps_limit
-    - generate.validation_split
+
+    - generate.temperature
+    - generate.rescale_process
+    - generate.rescale_post
     outs:
     - ../data/generated
+

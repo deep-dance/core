@@ -42,8 +42,8 @@ bones = [
 #get all tags 
 all_tags = set([tag for folderlist in motion_db.values() for folder in folderlist for tag in folder.split("_")])
 
-def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True,
-                      normalize_z = True, normalize_body=False,
+def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, hip_correction=True,
+                      normalize_z=True, normalize_body=False,
                       body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
                                                 0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
                                                 0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
@@ -56,7 +56,7 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
             if tags should only be included if they occur in combination, i.e ["impro", ["allbody", "uplevel"]]
       lookback: int, length of pose sequences in which data is cut for input into the model
       target_lenght: int, length of target poses the model is supposed to predict
-      traj: if False, subtracts the hip trajectory from all other keypoints but not from the hip itself
+      hip_correction: if False, subtracts the hip trajectory from all other keypoints but not from the hip itself
       normalize_body: if True, rescals pose to a predefined body size, given in body_segments
       body_segments: if normalize_body is True, pose is rescaled according to these segment lenghts
 
@@ -118,7 +118,7 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
                 rescaled_dataset.append(pose)
             dataset = np.asarray(rescaled_dataset)
           
-        if not traj:
+        if not hip_correction:
             # substract hip trajectory every but at hip keypoint
             dataset = np.array([np.concatenate(([x[0]], x[1:] - x[0])) for x in dataset])
          
@@ -135,13 +135,13 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
             
     return np.array(dataX), np.array(dataY)
 
-def normalize_pose(pose, body_segments, traj=True):
+def normalize_pose(pose, body_segments, hip_correction=True):
     """Normalizes post to parsed body segment length
     
     Arg:
       pose: data for single pose
       body_segments: array with length 16 with body desired body segment lengths
-      traj: if False, it is assumed that only pose[0] has the trajectory coordinates 
+      hip_correction: if False, it is assumed that only pose[0] has the trajectory coordinates 
             and all other coordinates are with respect to pose[0] = [0,0,0]. The normalized 
             pose is then returned in the same logic.
     Returns:
@@ -150,7 +150,7 @@ def normalize_pose(pose, body_segments, traj=True):
     p = pose.copy().reshape((17,3))
     count = 0
     new_pose = np.zeros((17,3))
-    if traj:
+    if hip_correction:
         new_pose[0] = p[0]
     else:
         p0 = p[0].copy()
@@ -162,13 +162,13 @@ def normalize_pose(pose, body_segments, traj=True):
         new_pose[bone[1]] = new_pose[bone[0]] + direction * body_segments[count]
         count += 1
         
-    if not traj:
+    if not hip_correction:
         new_pose[0] = p0
         
     return new_pose
 
 def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3,
-                         temp=1.0, sigma_temp=0.0, look_back=10, traj=True, post_rescale=False, rescale_while_generating=False,
+                         temp=1.0, sigma_temp=0.0, look_back=10, hip_correction=True, rescale_post=False, rescale_process=False,
                          body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
                                                    0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
                                                    0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
@@ -187,10 +187,10 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
       temp: the temperature for sampling between mixture components 
       sigma_temp: the temperature for sampling from the normal distribution
       look_back: number of poses the model takes as input
-      traj: if False, adds the hip trajectory to all other keypoints but the hip 
+      hip_correction: if False, adds the hip trajectory to all other keypoints but the hip 
            (this reverses the manipulation done in get_training_data() when flag traj=False is set)
-      post_rescale: if True, rescales performance to skeleton with segment lengths parsed in body_segments
-      rescale_while_generating: if True, rescales performance directly after prediction,
+      rescale_post: if True, rescales performance to skeleton with segment lengths parsed in body_segments
+      rescale_process: if True, rescales performance directly after prediction,
                                 so that the model always predicts the next poses on the basis of a normalized 
                                 seed sequence. body_segments_training should be the segment lenghts also used for training
                                 if normalization was applied.
@@ -204,8 +204,8 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
         params = model.predict(np.expand_dims(np.array(performance[-look_back:]), axis=0))
         new_poses = mdn.sample_from_output(params[0], 51, n_mixtures, temp=temp, sigma_temp=sigma_temp)
         for pose in new_poses:
-            if rescale_while_generating:
-                pose = normalize_pose(pose, body_segments_training, traj=traj)
+            if rescale_process:
+                pose = normalize_pose(pose, body_segments_training, hip_correction=hip_correction)
                 pose = pose.reshape((51))
             performance.append(pose)
         steps += len(new_poses)
@@ -213,11 +213,11 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
     #reshape performance array
     performance = np.reshape(performance,(np.shape(performance)[0],17,3))
     
-    if not traj:
+    if not hip_correction:
         performance = np.array([np.concatenate(([pose[0]], pose[1:] + pose[0])) for pose in performance])    
-    if post_rescale:
-        # traj = True, because trajectory transformation has already been reversed
-        performance = np.array([normalize_pose(pose, body_segments, traj=True) for pose in performance])
+    if rescale_post:
+        # hip_correction = True, because trajectory transformation has already been reversed
+        performance = np.array([normalize_pose(pose, body_segments, hip_correction=True) for pose in performance])
         
     return np.array(performance)
 
@@ -257,7 +257,7 @@ def save_seq_to_json(performance, filename, path_base_dir=os.path.abspath("./"))
 
 
 def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0, 
-                             floor_err= False, floor_err_weight=1.0, traj = False, tfsegs=None):
+                             floor_err= False, floor_err_weight=1.0, hip_correction=False, tfsegs=None):
     """Construct a  custom loss function for the MDN layer parametrised by number of mixtures.
        Additionally a penalty is added if the segment length deviates from the average segment length in the training data"""
     
@@ -298,7 +298,7 @@ def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0,
         # calculate means for keypoints
         kp_predicted_means = mixture.mean()
         kp_predicted_means = tf.reshape(kp_predicted_means, [-1,17,3])
-        if not traj:
+        if not hip_correction:
             t1 = kp_predicted_means[:,:1,:]
             t2 = kp_predicted_means[:,1:,:] + t1
             kp_predicted_means = tf.concat([t1, t2], 1)
@@ -322,3 +322,9 @@ def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0,
     # Actually return the loss function
     with tf.name_scope('MDN'):
         return mdn_loss_func
+
+def stringlist_to_array(stringlist, delimiter=','):
+    string_data = stringlist.split(delimiter)
+    for d in string_data:
+        d = d.strip()
+    return string_data
