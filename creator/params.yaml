@@ -8,8 +8,8 @@ prepare:
 train:
   epochs: 10
   batch_size: 32
-  look_back: 70
-  lstm_layer: 128
+  look_back: 30
+  lstm_layer: 32
   mdn_layer: 3
   custom_loss: true
   random_state: 42
@@ -19,7 +19,7 @@ train:
   validation_split: 0.3
 
 generate:
-  look_back: 70
+  look_back: 30
   random_state: 42
   seed: 1500
   steps_limit: 1500
