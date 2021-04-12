@@ -9,7 +9,7 @@ train:
   epochs: 10
   batch_size: 32
   look_back: 70
-  lstm_layer: 128
+  lstm_layer: 102
   mdn_layer: 3
   custom_loss: true
   random_state: 42
