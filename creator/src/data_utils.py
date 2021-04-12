@@ -168,7 +168,7 @@ def normalize_pose(pose, body_segments, traj=True):
     return new_pose
 
 def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3,
-                         temp=1.0, sigma_temp=0.0, look_back=10, traj=True, post_rescale=False,
+                         temp=1.0, sigma_temp=0.0, look_back=10, traj=True, post_rescale=False, rescale_while_generating=False,
                          body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
                                                    0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
                                                    0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
