@@ -12,27 +12,27 @@ stages:
         train.custom_loss: true
         train.dancers: all
         train.epochs: 10
-        train.look_back: 70
+        train.look_back: 30
         train.lstm_layer: 128
         train.mdn_layer: 3
         train.tags: impro
         train.validation_split: 0.3
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 6e8d341e7abe7db47c657d1877c2369d
-      size: 1064
+      md5: 79996d3851904597b337422bbfcb494a
+      size: 1063
     - path: ../data/metrics/deep-dance-scores.json
-      md5: 79bdd1ba922c6051d94582c34620d565
+      md5: bf26720c1b99934f523c8e57e07337f0
       size: 77
     - path: ../data/models
-      md5: de35038437e0d1acdf3e929cb88e99ec.dir
+      md5: 95a16ce4c0d3eecf1cecb0174e5fbace.dir
       size: 5013512
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: de35038437e0d1acdf3e929cb88e99ec.dir
+      md5: 95a16ce4c0d3eecf1cecb0174e5fbace.dir
       size: 5013512
       nfiles: 1
     - path: src/generate.py
@@ -41,13 +41,13 @@ stages:
     params:
       params.yaml:
         generate.custom_loss: true
-        generate.look_back: 70
+        generate.look_back: 30
         generate.random_state: 42
         generate.seed: 1500
         generate.steps_limit: 1500
         generate.validation_split: 0.3
     outs:
     - path: ../data/generated
-      md5: 27d47a967e2679cd62d5c2e54bb20036.dir
-      size: 1681384
+      md5: 4f72310b67a17b6e5fcdff6cd2a4abd1.dir
+      size: 1653676
       nfiles: 1
