@@ -42,10 +42,12 @@ bones = [
 #get all tags 
 all_tags = set([tag for folderlist in motion_db.values() for folder in folderlist for tag in folder.split("_")])
 
-def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True, normalize_z = True, normalize_body=False, body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
-        0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
-        0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
-        0.1993194 ])):
+def get_training_data(dancers = "all", tags = "all", look_back = 15, target_length = 1, traj = True,
+                      normalize_z = True, normalize_body=False,
+                      body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
+                                                0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
+                                                0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
+                                                0.1993194 ])):
     """loads data 
     
     Args:
@@ -254,7 +256,8 @@ def save_seq_to_json(performance, filename, path_base_dir=os.path.abspath("./"))
         
 
 
-def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0, floor_err= False, floor_err_weight=1.0, traj = False, tfsegs=None):
+def custom_mixture_loss_func(output_dim, num_mixes, segs_loss_weight=1.0, 
+                             floor_err= False, floor_err_weight=1.0, traj = False, tfsegs=None):
     """Construct a  custom loss function for the MDN layer parametrised by number of mixtures.
        Additionally a penalty is added if the segment length deviates from the average segment length in the training data"""
     
