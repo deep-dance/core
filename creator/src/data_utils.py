@@ -133,24 +133,48 @@ def get_training_data(dancers = "all", tags = "all", look_back = 15, target_leng
             
     return np.array(dataX), np.array(dataY)
 
-def normalize_pose(pose, body_segments):
-    p = pose.reshape((17,3))
+def normalize_pose(pose, body_segments, traj=True):
+    """Normalizes post to parsed body segment length
+    
+    Arg:
+      pose: data for single pose
+      body_segments: array with length 16 with body desired body segment lengths
+      traj: if False, it is assumed that only pose[0] has the trajectory coordinates 
+            and all other coordinates are with respect to pose[0] = [0,0,0]. The normalized 
+            pose is then returned in the same logic.
+    Returns:
+      Normalized pose with desired segment lengths
+    """
+    p = pose.copy().reshape((17,3))
     count = 0
     new_pose = np.zeros((17,3))
-    new_pose[0] = p[0]
-    for bone in bones:
-        #print("count, bone, p[bone[0]]", count, bone, p[bone[0]])
+    if traj:
+        new_pose[0] = p[0]
+    else:
+        p0 = p[0].copy()
+        p[0] = [0,0,0] 
+        new_pose[0] = [0,0,0]  
+    for bone in bones: 
         direction = np.subtract(p[bone[1]], p[bone[0]])
         direction = direction / np.sqrt(np.sum(direction**2))
         new_pose[bone[1]] = new_pose[bone[0]] + direction * body_segments[count]
         count += 1
         
+    if not traj:
+        new_pose[0] = p0
+        
     return new_pose
 
-def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3, temp=1.0, sigma_temp=0.0, look_back=10, traj=True, post_rescale=False,body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
-        0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
-        0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
-        0.1993194 ])):
+def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3,
+                         temp=1.0, sigma_temp=0.0, look_back=10, traj=True, post_rescale=False,
+                         body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
+                                                   0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
+                                                   0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
+                                                   0.1993194 ]),
+                        body_segments_training = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
+                                                   0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,
+                                                   0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,
+                                                   0.1993194 ])):
     """Generates aperformance
     
     Args:
@@ -163,6 +187,11 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
       look_back: number of poses the model takes as input
       traj: if False, adds the hip trajectory to all other keypoints but the hip 
            (this reverses the manipulation done in get_training_data() when flag traj=False is set)
+      post_rescale: if True, rescales performance to skeleton with segment lengths parsed in body_segments
+      rescale_while_generating: if True, rescales performance directly after prediction,
+                                so that the model always predicts the next poses on the basis of a normalized 
+                                seed sequence. body_segments_training should be the segment lenghts also used for training
+                                if normalization was applied.
     Returns: 
       numpy array with generated pose sequence"""
 
@@ -173,6 +202,9 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
         params = model.predict(np.expand_dims(np.array(performance[-look_back:]), axis=0))
         new_poses = mdn.sample_from_output(params[0], 51, n_mixtures, temp=temp, sigma_temp=sigma_temp)
         for pose in new_poses:
+            if rescale_while_generating:
+                pose = normalize_pose(pose, body_segments_training, traj=traj)
+                pose = pose.reshape((51))
             performance.append(pose)
         steps += len(new_poses)
         
@@ -182,7 +214,8 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
     if not traj:
         performance = np.array([np.concatenate(([pose[0]], pose[1:] + pose[0])) for pose in performance])    
     if post_rescale:
-        performance = np.array([normalize_pose(pose, body_segments) for pose in performance])
+        # traj = True, because trajectory transformation has already been reversed
+        performance = np.array([normalize_pose(pose, body_segments, traj=True) for pose in performance])
         
     return np.array(performance)
 
