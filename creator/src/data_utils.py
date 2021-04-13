@@ -7,7 +7,7 @@ import tensorflow as tf
 
 
 # get motion_db file structure
-basedir = '../../data/train/video/deep-dance/'
+basedir = '../data/train/video/deep-dance/'
 motion_db = {}
 dancers = [dancer for dancer in next(os.walk(basedir))[1]]
 for dancer in dancers:

@@ -15,8 +15,8 @@ train:
   look_back: 10
   normalize_body: true
   hip_correction: false
-  epochs: 1
-  batch_size: 32
+  epochs: 3
+  batch_size: 64
   lstm_layer: 32
   mdn_layer: 3
   
