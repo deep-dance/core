@@ -8,7 +8,7 @@ ARG GIT_CLONE="git clone --depth 10"
 RUN    rm -rf /var/lib/apt/lists/* \
            /etc/apt/sources.list.d/cuda.list \
            /etc/apt/sources.list.d/nvidia-ml.list && \
-    apt-get update 
+    apt-get update --fix-missing
 
 # ==================================================================
 # tools
@@ -27,6 +27,7 @@ RUN DEBIAN_FRONTEND=noninteractive ${APT_INSTALL} \
         unzip \
         unrar \
         ffmpeg \
+        strace \
         && \
     ${GIT_CLONE} https://github.com/Kitware/CMake ~/cmake && \
     cd ~/cmake && \
