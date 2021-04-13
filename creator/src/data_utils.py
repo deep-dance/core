@@ -7,7 +7,7 @@ import tensorflow as tf
 
 
 # get motion_db file structure
-basedir = '../data/train/video/deep-dance/'
+basedir = '../../data/train/video/deep-dance/'
 motion_db = {}
 dancers = [dancer for dancer in next(os.walk(basedir))[1]]
 for dancer in dancers:
@@ -112,7 +112,7 @@ def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, 
             print("Normalizing body...")
             rescaled_dataset = []
             for pose in dataset:
-                pose = normalize_pose(pose, body_segments, hip_correction=hip_correction)
+                pose = normalize_pose(pose, body_segments, hip_correction=True)
                 rescaled_dataset.append(pose)
             dataset = np.asarray(rescaled_dataset)
           
@@ -212,6 +212,7 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
     performance = np.reshape(performance,(np.shape(performance)[0],17,3))
     
     if not hip_correction:
+        print("Correct the Hip")
         performance = np.array([np.concatenate(([pose[0]], pose[1:] + pose[0])) for pose in performance])    
     if rescale_post:
         # hip_correction = True, because trajectory transformation has already been reversed
