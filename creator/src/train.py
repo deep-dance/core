@@ -54,14 +54,30 @@ if __name__ == '__main__':
     dancers = params['dancers']
     tags = params['tags']
     random_state = params['random_state']
+    test_size = params['test_size']
+    validation_split = params['validation_split']
     epochs = params['epochs']
     batch_size = params['batch_size']
     look_back = params['look_back']
     lstm_layer = params['lstm_layer']
     mdn_layer = params['mdn_layer']
     normalize_body = params['normalize_body']
-    validation_split = params['validation_split']
-    test_size = params['test_size']
+    hip_correction = params['hip_correction']
+
+    print('-------------------------')
+    print('dancers:', dancers)
+    print('tags:', tags)
+    print('random_state:', random_state)
+    print('test_size:', test_size)
+    print('validation_split:', validation_split)
+    print('look_back:', look_back)
+    print('normalize_body:', normalize_body)
+    print('hip_correction:', hip_correction)
+    print('epochs:', epochs)
+    print('batch_size:', batch_size)
+    print('lstm_layer:', lstm_layer)
+    print('mdn_layer:', mdn_layer)
+    print('-------------------------')
 
     args = get_parser().parse_args()
 
@@ -90,7 +106,8 @@ if __name__ == '__main__':
     selected_tags = stringlist_to_array(tags)
 
     x, y = get_training_data(dancers=selected_dancers, tags=selected_tags,
-        look_back=look_back, normalize_body=normalize_body)
+        look_back=look_back, normalize_body=normalize_body,
+        hip_correction=hip_correction)
     
     x_train, x_test, y_train, y_test=train_test_split(
         x, y, test_size=test_size, shuffle=True, random_state=random_state)

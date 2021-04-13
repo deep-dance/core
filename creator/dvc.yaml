@@ -41,10 +41,6 @@ stages:
 
     - generate.seed
     - generate.steps_limit
-
-    - generate.temperature
-    - generate.rescale_process
-    - generate.rescale_post
     outs:
     - ../data/generated
 

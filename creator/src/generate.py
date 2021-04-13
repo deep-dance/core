@@ -45,10 +45,17 @@ if __name__ == '__main__':
     
     seed = params['seed']
     steps_limit = params['steps_limit']
-    temperature = params['temperature']
-    rescale_process = params['rescale_process']
-    rescale_post = params['rescale_post']
-    
+
+    print('-------------------------')
+    print('dancers:', dancers)
+    print('tags:', tags)
+    print('random_state:', random_state)
+    print('test_size:', test_size)
+    print('validation_split:', validation_split)
+    print('look_back:', look_back)
+    print('normalize_body:', normalize_body)
+    print('hip_correction:', hip_correction)
+    print('-------------------------')
 
     args = get_parser().parse_args()
 
@@ -62,7 +69,7 @@ if __name__ == '__main__':
     # x_test = np.load('../data/train/prepared/x_test.npz')
 
     # TODO Remove after NPZ export fix
-    print("Loading prepared data. This might take a while..")
+    print("Loading prepared data. This might take a while...")
 
     selected_dancers = stringlist_to_array(dancers)
     selected_tags = stringlist_to_array(tags)
@@ -79,8 +86,14 @@ if __name__ == '__main__':
     model.load('../data/models/deep-dance.h5')
 
     print('Generating sequences...')
-    model.generate('../data/generated/deep-dance-seq.json', x_test,
-        seed, steps_limit, hip_correction, temperature, rescale_process, rescale_post)
+    for temperature in [0.5, 0.75, 1.0]:
+        for rescale_process in [True, False]:
+            for rescale_post in [True, False]:
+                if not(rescale_process and rescale_post):
+                    postfix = str(temperature).replace('.', '_') + '-' + str(rescale_process) + '-' + str(rescale_post)
+                    model.generate('../data/generated/deep-dance-seq-' + postfix + '.json',
+                        x_test, seed, steps_limit, look_back, hip_correction,
+                        temperature, rescale_process, rescale_post)
 
     
     

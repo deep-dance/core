@@ -21,17 +21,20 @@ command = 'dvc exp run --queue \
 -S train.dancers={0} \
 -S train.validation_split={1} \
 -S train.look_back={2} \
--S train.epochs={3} \
--S train.lstm_layer={4} \
--S generate.dancers={5} \
--S generate.validation_split={6} \
--S generate.look_back={7} \
--S generate.temperature={8} \
--S generate.rescale_process={9} \
--S generate.rescale_post={10}'
+-S train.normalize_body={3} \
+-S train.epochs={4} \
+-S train.lstm_layer={5} \
+-S generate.dancers={6} \
+-S generate.validation_split={7} \
+-S generate.look_back={8} \
+-S generate.normalize_body={9} \
+-S generate.temperature={10} \
+-S generate.rescale_process={11} \
+-S generate.rescale_post={12}'
 
 epochs = 10
 validation_split = 0.9
+normalize_body = False
 
 def run_exp_suite_01(call = False):
     dancers = 'all'
@@ -46,12 +49,14 @@ def run_exp_suite_01(call = False):
                                 dancers,
                                 validation_split,
                                 look_back,
+                                normalize_body,
                                 epochs,
                                 lstm_layer,
                                 # generate
                                 dancers,
                                 validation_split,
                                 look_back,
+                                normalize_body,
                                 temperature,
                                 rescale_process,
                                 rescale_post)

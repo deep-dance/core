@@ -31,8 +31,5 @@ generate:
   hip_correction: false
   seed: 1500
   steps_limit: 1500
-  temperature: 1.0
-  rescale_process: true
-  rescale_post: false
   
   

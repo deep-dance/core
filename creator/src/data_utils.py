@@ -64,9 +64,7 @@ def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, 
       X,y i.e input (X),target (y) both numpy arrays for model training
     
     """
-    print("Normalize body: ",str(normalize_body)) 
     # default gets the data of all dancers
-
     print("Getting data for dancers: ", dancers)
     if 'all' in dancers:
         dancers = list(motion_db.keys())
@@ -111,12 +109,13 @@ def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, 
                     
         #rescale pose to a predefined body size
         if normalize_body:
-            print("Normalize")
+            print("Normalizing body...")
             rescaled_dataset = []
             for pose in dataset:
-                pose = normalize_pose(pose, body_segments)
+                pose = normalize_pose(pose, body_segments, hip_correction=hip_correction)
                 rescaled_dataset.append(pose)
             dataset = np.asarray(rescaled_dataset)
+            print("Done.")
           
         if not hip_correction:
             # substract hip trajectory every but at hip keypoint
