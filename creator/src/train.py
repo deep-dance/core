@@ -100,7 +100,7 @@ if __name__ == '__main__':
     # y_test = np.load('../data/train/prepared/y_test.npz')
 
     # TODO Remove after NPZ export fix
-    print("Loading prepared data. This might take a while..")
+    print("Loading prepared data. This might take a while...")
 
     selected_dancers = stringlist_to_array(dancers)
     selected_tags = stringlist_to_array(tags)
@@ -109,8 +109,10 @@ if __name__ == '__main__':
         look_back=look_back, normalize_body=normalize_body,
         hip_correction=hip_correction)
     
+    print("Data loaded. Splitting now...")
     x_train, x_test, y_train, y_test=train_test_split(
-        x, y, test_size=test_size, shuffle=True, random_state=random_state)
+            x, y, test_size=test_size, shuffle=True, random_state=random_state)
+    
 
     print("Data shape(s):")
     print("x: ", np.shape(x_train))

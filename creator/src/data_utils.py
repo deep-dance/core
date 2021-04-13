@@ -115,7 +115,6 @@ def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, 
                 pose = normalize_pose(pose, body_segments, hip_correction=hip_correction)
                 rescaled_dataset.append(pose)
             dataset = np.asarray(rescaled_dataset)
-            print("Done.")
           
         if not hip_correction:
             # substract hip trajectory every but at hip keypoint
