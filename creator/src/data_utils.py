@@ -104,12 +104,11 @@ def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, 
         
     # create input and target data
     dataX, dataY = [], []
+    index = 0
     for dataset in data:
-        
-                    
         #rescale pose to a predefined body size
         if normalize_body:
-            print("Normalizing body...")
+            print("Preparing dataset", index, "and normalizing body...")
             rescaled_dataset = []
             for pose in dataset:
                 pose = normalize_pose(pose, body_segments, hip_correction=True)
@@ -129,6 +128,7 @@ def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, 
             dataX.append(a)
             # dataY has dimension [samples, features = (keypoints*3dim)] 
             dataY.append(dataset[i + look_back : i + look_back + target_length, :])
+        index = index + 1
      
             
     return np.array(dataX), np.array(dataY)
