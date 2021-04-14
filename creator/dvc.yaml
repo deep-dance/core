@@ -1,4 +1,17 @@
 stages:
+  # prepare:
+  #   cmd: python src/prepare.py
+  #   deps:
+  #   - ../data/train/video
+  #   params:
+  #   - generate.dancers
+  #   - generate.tags
+  #   - generate.random_state
+  #   - generate.test_size
+  #   - generate.validation_split
+  #   - generate.look_back
+  #   outs:
+  #   - ../data/train/prepared
   train:
     cmd: python src/train.py
     deps:
