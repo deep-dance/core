@@ -5,31 +5,31 @@ prepare:
   test_size: 0.05
   validation_split: 0.1
   look_back: 10
-  
+
 train:
-  dancers: maria
+  dancers: maria,raymond,tinyeung
   tags: impro
   random_state: 42
   test_size: 0.05
-  validation_split: 0.1
+  validation_split: 0.9
   look_back: 10
   normalize_body: true
   hip_correction: false
-  epochs: 3
+  epochs: 5
   batch_size: 64
   lstm_layer: 32
   mdn_layer: 3
-  
+
 generate:
-  dancers: maria
+  dancers: maria,raymond,tinyeung
   tags: impro
   random_state: 42
   test_size: 0.05
-  validation_split: 0.1
+  validation_split: 0.9
   look_back: 10
   normalize_body: true
   hip_correction: false
   seed: 1500
   steps_limit: 1500
-  
-  
+
+
