@@ -55,6 +55,8 @@ if __name__ == '__main__':
     print('look_back:', look_back)
     print('normalize_body:', normalize_body)
     print('hip_correction:', hip_correction)
+    print('seed:', seed)
+    print('steps_limit:', steps_limit)
     print('-------------------------')
 
     args = get_parser().parse_args()
@@ -87,8 +89,8 @@ if __name__ == '__main__':
 
     print('Generating sequences...')
     for temperature in [0.5, 0.75, 1.0]:
-        for rescale_process in [True, False]:
-            for rescale_post in [True, False]:
+        for rescale_process in [False]:
+            for rescale_post in [True]:
                 if not(rescale_process and rescale_post):
                     postfix = str(temperature).replace('.', '_') + '-' + str(rescale_process) + '-' + str(rescale_post)
                     model.generate('../data/generated/deep-dance-seq-' + postfix + '.json',
