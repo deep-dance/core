@@ -12,7 +12,10 @@
 # --------------------------
 # Queue up experiments. Please see 'exp_generate.py' on how to generate these DVC calls.
 # --------------------------
-dvc exp run --queue -S train.dancers=all -S train.validation_split=0.9 -S train.look_back=70 -S train.epochs=10 -S train.lstm_layer=32 -S generate.dancers=all -S generate.validation_split=0.9 -S generate.look_back=70
+dvc exp run --queue -S train.dancers=all -S train.validation_split=0.9 -S train.look_back=10 -S train.epochs=5 -S train.lstm_layer=32 -S generate.dancers=all -S generate.validation_split=0.9 -S generate.look_back=10
+dvc exp run --queue -S train.dancers=all -S train.validation_split=0.9 -S train.look_back=10 -S train.epochs=5 -S train.lstm_layer=64 -S generate.dancers=all -S generate.validation_split=0.9 -S generate.look_back=10
+dvc exp run --queue -S train.dancers=maria,raymond -S train.validation_split=0.9 -S train.look_back=10 -S train.epochs=5 -S train.lstm_layer=32 -S generate.dancers=maria,raymond -S generate.validation_split=0.9 -S generate.look_back=10
+dvc exp run --queue -S train.dancers=maria,raymond,tinyeung -S train.validation_split=0.9 -S train.look_back=10 -S train.epochs=5 -S train.lstm_layer=32 -S generate.dancers=maria,raymond,tinyeung -S generate.validation_split=0.9 -S generate.look_back=10
 
 # Run queued experiments
 # ---------------------------
