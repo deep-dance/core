@@ -9,41 +9,41 @@ stages:
     params:
       params.yaml:
         train.batch_size: 64
-        train.dancers: maria
-        train.epochs: 3
+        train.dancers: all
+        train.epochs: 5
         train.hip_correction: false
         train.look_back: 10
-        train.lstm_layer: 32
+        train.lstm_layer: 64
         train.mdn_layer: 3
         train.normalize_body: true
         train.random_state: 42
         train.tags: impro
         train.test_size: 0.05
-        train.validation_split: 0.1
+        train.validation_split: 0.9
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 6ec3ea7d471f46f710755690459e101d
-      size: 334
+      md5: d786ea7ed6b6dbd68e647c646dd05dac
+      size: 548
     - path: ../data/metrics/deep-dance-scores.json
-      md5: 1034e542db92a7287d226a3ec8934f73
-      size: 77
+      md5: 142d3e7d61f49688ff11f0dae64d366d
+      size: 79
     - path: ../data/models
-      md5: 8a20c2325b4109d08fcd199419ea779a.dir
-      size: 535704
+      md5: 014c96dd566af3a21b9a46bf465f1fc7.dir
+      size: 1513940
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: 8a20c2325b4109d08fcd199419ea779a.dir
-      size: 535704
+      md5: 014c96dd566af3a21b9a46bf465f1fc7.dir
+      size: 1513940
       nfiles: 1
     - path: src/generate.py
       md5: 27e888dfc73aabe77d2af35ff405312f
       size: 3640
     params:
       params.yaml:
-        generate.dancers: maria
+        generate.dancers: all
         generate.hip_correction: false
         generate.look_back: 10
         generate.normalize_body: true
@@ -52,9 +52,9 @@ stages:
         generate.steps_limit: 1500
         generate.tags: impro
         generate.test_size: 0.05
-        generate.validation_split: 0.1
+        generate.validation_split: 0.9
     outs:
     - path: ../data/generated
-      md5: f1494eec730091f220bd6b5e3d791d91.dir
-      size: 14734271
+      md5: d8174077b96f3c992259e676b25cd31a.dir
+      size: 14799388
       nfiles: 9
