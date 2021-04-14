@@ -9,52 +9,52 @@ stages:
     params:
       params.yaml:
         train.batch_size: 64
-        train.dancers: maria
+        train.dancers: tinyeung
         train.epochs: 3
         train.hip_correction: false
         train.look_back: 10
-        train.lstm_layer: 32
+        train.lstm_layer: 64
         train.mdn_layer: 3
         train.normalize_body: true
         train.random_state: 42
-        train.tags: impro
+        train.tags: walking
         train.test_size: 0.05
         train.validation_split: 0.1
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 6ec3ea7d471f46f710755690459e101d
-      size: 334
+      md5: 6e38273a5c24dc84606be44b74ca1ecb
+      size: 335
     - path: ../data/metrics/deep-dance-scores.json
-      md5: 1034e542db92a7287d226a3ec8934f73
-      size: 77
+      md5: e714d1dcebb5c1d783591ac036db55a8
+      size: 79
     - path: ../data/models
-      md5: 8a20c2325b4109d08fcd199419ea779a.dir
-      size: 535704
+      md5: 9a06b55131fb292f767b503b5064c6dc.dir
+      size: 1513940
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: 8a20c2325b4109d08fcd199419ea779a.dir
-      size: 535704
+      md5: 9a06b55131fb292f767b503b5064c6dc.dir
+      size: 1513940
       nfiles: 1
     - path: src/generate.py
       md5: 27e888dfc73aabe77d2af35ff405312f
       size: 3640
     params:
       params.yaml:
-        generate.dancers: maria
+        generate.dancers: tinyeung
         generate.hip_correction: false
         generate.look_back: 10
         generate.normalize_body: true
         generate.random_state: 42
-        generate.seed: 1500
+        generate.seed: 0
         generate.steps_limit: 1500
-        generate.tags: impro
+        generate.tags: walking
         generate.test_size: 0.05
         generate.validation_split: 0.1
     outs:
     - path: ../data/generated
-      md5: f1494eec730091f220bd6b5e3d791d91.dir
-      size: 14734271
+      md5: 3a1a15abdfbb905de17235fff7ed6b34.dir
+      size: 14627582
       nfiles: 9
