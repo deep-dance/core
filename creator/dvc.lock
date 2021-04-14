@@ -39,8 +39,8 @@ stages:
       size: 535704
       nfiles: 1
     - path: src/generate.py
-      md5: 27e888dfc73aabe77d2af35ff405312f
-      size: 3640
+      md5: 641c4743e8d846129f6b86a360fc86ed
+      size: 3691
     params:
       params.yaml:
         generate.dancers: maria
@@ -55,6 +55,6 @@ stages:
         generate.validation_split: 0.1
     outs:
     - path: ../data/generated
-      md5: f1494eec730091f220bd6b5e3d791d91.dir
-      size: 14734271
-      nfiles: 9
+      md5: 89fde3108db5ac83f2c0d0c8ca287638.dir
+      size: 4920616
+      nfiles: 3
