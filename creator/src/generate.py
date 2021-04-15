@@ -42,6 +42,7 @@ if __name__ == '__main__':
     look_back = params['look_back']
     normalize_body = params['normalize_body']
     hip_correction = params['hip_correction']
+    kinetic = params['kinetic']
     
     seed = params['seed']
     steps_limit = params['steps_limit']
@@ -55,6 +56,7 @@ if __name__ == '__main__':
     print('look_back:', look_back)
     print('normalize_body:', normalize_body)
     print('hip_correction:', hip_correction)
+    print('kinetic:', kinetic)
     print('seed:', seed)
     print('steps_limit:', steps_limit)
     print('-------------------------')
@@ -77,14 +79,15 @@ if __name__ == '__main__':
     selected_tags = stringlist_to_array(tags)
 
     x, y = get_training_data(dancers=selected_dancers, tags=selected_tags,
-        look_back=look_back, normalize_body=normalize_body, hip_correction=hip_correction)
+        look_back=look_back, normalize_body=normalize_body,
+        hip_correction=hip_correction, add_kinetic_energy=kinetic)
         
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=test_size, shuffle=True, random_state=random_state)
 
     os.makedirs(os.path.join('../', 'data', 'generated'), exist_ok=True)
 
-    model = DeepDanceModel(custom_loss=True)
+    model = DeepDanceModel(kinetic=kinetic)
     model.load('../data/models/deep-dance.h5')
 
     print('Generating sequences...')

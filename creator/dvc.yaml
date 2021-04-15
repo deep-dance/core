@@ -12,6 +12,9 @@ stages:
   #   - generate.look_back
   #   outs:
   #   - ../data/train/prepared
+  # TODO: Move and merge dataset
+  # train and generate params into 
+  # prepare stage.
   train:
     cmd: python src/train.py
     deps:
@@ -25,6 +28,7 @@ stages:
     - train.look_back
     - train.normalize_body
     - train.hip_correction
+    - train.kinetic
     - train.batch_size
     - train.epochs
     - train.lstm_layer
@@ -51,6 +55,7 @@ stages:
     - generate.look_back
     - generate.normalize_body
     - generate.hip_correction
+    - generate.kinetic
 
     - generate.seed
     - generate.steps_limit

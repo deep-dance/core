@@ -4,16 +4,17 @@ stages:
     cmd: python src/train.py
     deps:
     - path: src/train.py
-      md5: d59a10d2ff5ab0ccf127a01e18a52591
-      size: 4827
+      md5: d4d9e9d3543f033c3004e042f68e7f7d
+      size: 4917
     params:
       params.yaml:
         train.batch_size: 64
         train.dancers: maria
-        train.epochs: 3
+        train.epochs: 1
         train.hip_correction: false
+        train.kinetic: false
         train.look_back: 10
-        train.lstm_layer: 32
+        train.lstm_layer: 64
         train.mdn_layer: 3
         train.normalize_body: true
         train.random_state: 42
@@ -22,29 +23,30 @@ stages:
         train.validation_split: 0.1
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 6ec3ea7d471f46f710755690459e101d
-      size: 334
+      md5: c03415c1bf3b48ac6f7e41b4ce19c948
+      size: 127
     - path: ../data/metrics/deep-dance-scores.json
-      md5: 1034e542db92a7287d226a3ec8934f73
-      size: 77
+      md5: fd99213f6fbac2ec3d7d4256a95833e6
+      size: 79
     - path: ../data/models
-      md5: 8a20c2325b4109d08fcd199419ea779a.dir
-      size: 535704
+      md5: 22768d7fceb2e05d945222269686f583.dir
+      size: 1513940
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: 8a20c2325b4109d08fcd199419ea779a.dir
-      size: 535704
+      md5: 22768d7fceb2e05d945222269686f583.dir
+      size: 1513940
       nfiles: 1
     - path: src/generate.py
-      md5: 641c4743e8d846129f6b86a360fc86ed
-      size: 3691
+      md5: 05aa3c5cfa20163bf1398fd8527f9d94
+      size: 3789
     params:
       params.yaml:
         generate.dancers: maria
         generate.hip_correction: false
+        generate.kinetic: false
         generate.look_back: 10
         generate.normalize_body: true
         generate.random_state: 42
@@ -55,6 +57,6 @@ stages:
         generate.validation_split: 0.1
     outs:
     - path: ../data/generated
-      md5: 89fde3108db5ac83f2c0d0c8ca287638.dir
-      size: 4920616
+      md5: 676d741727b08cf5c3c0a1f5fa98ad51.dir
+      size: 4904118
       nfiles: 3
