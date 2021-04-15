@@ -38,19 +38,19 @@ class DeepDanceModel:
     
     def __init__(
             self,
-            look_back=10, lstm_layers=32,
-            mdn_layers=3, validation_split=0.10, custom_loss=True):
+            look_back=10, lstm_layers=32, mdn_layers=3, validation_split=0.10,
+            custom_loss=True, kinetic=False):
+        self.validation_split = validation_split
         self.look_back = look_back
         self.mdn_layers = mdn_layers
         self.custom_loss = custom_loss
         self.trained = False
-
-        self.validation_split = validation_split
-                
+        dim = 52 if kinetic else 51
+        
         self.model = keras.Sequential()
         self.model.add(layers.LSTM(
             lstm_layers,
-            input_shape=(self.look_back, 51),  return_sequences=True))
+            input_shape=(self.look_back, dim),  return_sequences=True))
         self.model.add(layers.LSTM(lstm_layers, return_sequences=True))
         self.model.add(layers.LSTM(lstm_layers))
         self.model.add(layers.Dense(lstm_layers))
