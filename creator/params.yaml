@@ -5,24 +5,24 @@ prepare:
   test_size: 0.05
   validation_split: 0.1
   look_back: 10
-  
+
 train:
-  dancers: maria
-  tags: impro
+  dancers: all
+  tags: all
   random_state: 42
   test_size: 0.05
   validation_split: 0.1
   look_back: 10
   normalize_body: true
   hip_correction: false
-  epochs: 3
+  epochs: 5
   batch_size: 64
-  lstm_layer: 32
+  lstm_layer: 64
   mdn_layer: 3
-  
+
 generate:
-  dancers: maria
-  tags: impro
+  dancers: all
+  tags: all
   random_state: 42
   test_size: 0.05
   validation_split: 0.1
@@ -30,6 +30,6 @@ generate:
   normalize_body: true
   hip_correction: false
   seed: 1500
-  steps_limit: 1500
-  
-  
+  steps_limit: 30000
+
+

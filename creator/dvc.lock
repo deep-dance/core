@@ -9,52 +9,52 @@ stages:
     params:
       params.yaml:
         train.batch_size: 64
-        train.dancers: maria
-        train.epochs: 3
+        train.dancers: all
+        train.epochs: 5
         train.hip_correction: false
         train.look_back: 10
-        train.lstm_layer: 32
+        train.lstm_layer: 64
         train.mdn_layer: 3
         train.normalize_body: true
         train.random_state: 42
-        train.tags: impro
+        train.tags: all
         train.test_size: 0.05
         train.validation_split: 0.1
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 6ec3ea7d471f46f710755690459e101d
-      size: 334
+      md5: 302e25508f071cec41c54da4457989ba
+      size: 548
     - path: ../data/metrics/deep-dance-scores.json
-      md5: 1034e542db92a7287d226a3ec8934f73
-      size: 77
+      md5: 7e1ae9f666716c7002a2d96a92d32572
+      size: 80
     - path: ../data/models
-      md5: 8a20c2325b4109d08fcd199419ea779a.dir
-      size: 535704
+      md5: c466950811f07191b7c4437627d046b3.dir
+      size: 1513940
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: 8a20c2325b4109d08fcd199419ea779a.dir
-      size: 535704
+      md5: c466950811f07191b7c4437627d046b3.dir
+      size: 1513940
       nfiles: 1
     - path: src/generate.py
       md5: 641c4743e8d846129f6b86a360fc86ed
       size: 3691
     params:
       params.yaml:
-        generate.dancers: maria
+        generate.dancers: all
         generate.hip_correction: false
         generate.look_back: 10
         generate.normalize_body: true
         generate.random_state: 42
         generate.seed: 1500
-        generate.steps_limit: 1500
-        generate.tags: impro
+        generate.steps_limit: 30000
+        generate.tags: all
         generate.test_size: 0.05
         generate.validation_split: 0.1
     outs:
     - path: ../data/generated
-      md5: 89fde3108db5ac83f2c0d0c8ca287638.dir
-      size: 4920616
+      md5: da4e5b8e4ea277e52feb46336988aa28.dir
+      size: 96730126
       nfiles: 3
