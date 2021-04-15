@@ -95,9 +95,6 @@ def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, 
     for filename in set(include_files):
         keypoints = np.load(filename, allow_pickle=True)
         frames = keypoints['arr_0']
-        if normalize_z:
-            #substract mean from z axis
-            frames = np.concatenate((frames[:,:,:2],frames[:,:,2:]-np.mean(np.min(frames[:,:,2], axis=1))), axis=2)
         data.append(frames)
         
 
@@ -114,6 +111,10 @@ def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, 
                 pose = normalize_pose(pose, body_segments, hip_correction=True)
                 rescaled_dataset.append(pose)
             dataset = np.asarray(rescaled_dataset)
+            
+        if normalize_z:
+            #substract mean from z axis
+            dataset = np.concatenate((dataset[:,:,:2],dataset[:,:,2:]-np.mean(np.min(dataset[:,:,2], axis=1))), axis=2)
           
         if not hip_correction:
             # substract hip trajectory every but at hip keypoint
