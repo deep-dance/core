@@ -98,7 +98,7 @@ if __name__ == '__main__':
                     postfix = str(temperature).replace('.', '_') + '-' + str(rescale_process) + '-' + str(rescale_post)
                     model.generate('../data/generated/deep-dance-seq-' + postfix + '.json',
                         x_test, seed, steps_limit, look_back, hip_correction,
-                        temperature, rescale_process, rescale_post)
+                        temperature, rescale_process, rescale_post, kinetic)
 
     
     

@@ -23,25 +23,25 @@ stages:
         train.validation_split: 0.1
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 7f725c460c8b0530cdcfcd41a37cbb9c
+      md5: 93d5516e64bb0ae8df16dd0c11d170df
       size: 127
     - path: ../data/metrics/deep-dance-scores.json
-      md5: 358680b014b8440f4d185c1e36bd1602
+      md5: 424aee415aa402d8619027e75a7207e0
       size: 79
     - path: ../data/models
-      md5: a2b90eb6c078a9d33e24b2f5f3b94efd.dir
+      md5: 0e04936d63b773da319f85bacf146322.dir
       size: 1513940
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: a2b90eb6c078a9d33e24b2f5f3b94efd.dir
+      md5: 0e04936d63b773da319f85bacf146322.dir
       size: 1513940
       nfiles: 1
     - path: src/generate.py
-      md5: 05aa3c5cfa20163bf1398fd8527f9d94
-      size: 3789
+      md5: 56571d3d48752539d175c10be4983366
+      size: 3798
     params:
       params.yaml:
         generate.dancers: maria
@@ -57,6 +57,6 @@ stages:
         generate.validation_split: 0.1
     outs:
     - path: ../data/generated
-      md5: cd83accc4e5dd69da04a8844ca289d77.dir
-      size: 4927314
+      md5: 7ed2eb7b9316781e72b8b8531d31748b.dir
+      size: 4950311
       nfiles: 3
