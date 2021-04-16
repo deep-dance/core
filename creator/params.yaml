@@ -14,27 +14,27 @@ train:
   tags: impro
   random_state: 42
   test_size: 0.05
-  validation_split: 0.1
+  validation_split: 0.3
   look_back: 10
   normalize_body: true
   hip_correction: false
-  kinetic: false
-  epochs: 1
+  kinetic: true
+  epochs: 10
   batch_size: 64
   lstm_layer: 64
   mdn_layer: 3
-  
+
 generate:
   dancers: maria
   tags: impro
   random_state: 42
   test_size: 0.05
-  validation_split: 0.1
+  validation_split: 0.3
   look_back: 10
   normalize_body: true
   hip_correction: false
-  kinetic: false
+  kinetic: true
   seed: 1500
   steps_limit: 1500
-  
-  
+
+

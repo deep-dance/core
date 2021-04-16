@@ -10,9 +10,9 @@ stages:
       params.yaml:
         train.batch_size: 64
         train.dancers: maria
-        train.epochs: 1
+        train.epochs: 10
         train.hip_correction: false
-        train.kinetic: false
+        train.kinetic: true
         train.look_back: 10
         train.lstm_layer: 64
         train.mdn_layer: 3
@@ -20,24 +20,24 @@ stages:
         train.random_state: 42
         train.tags: impro
         train.test_size: 0.05
-        train.validation_split: 0.1
+        train.validation_split: 0.3
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 66a876cdd8fc5a8ef638408b357ace67
-      size: 128
+      md5: 224027e99e8a6a96b7f13d8c8cb6494d
+      size: 1068
     - path: ../data/metrics/deep-dance-scores.json
-      md5: f95159c3cc5c65d0cec16ca20f8b3b68
-      size: 80
+      md5: 5e9cb6b68c5f6e1ef696c4e0ad132a44
+      size: 78
     - path: ../data/models
-      md5: d33e7154f28966cce0b1547a08f27461.dir
-      size: 1513940
+      md5: d83c9aa1bd5a2c5de9d4b32e9cf45228.dir
+      size: 1517012
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: d33e7154f28966cce0b1547a08f27461.dir
-      size: 1513940
+      md5: d83c9aa1bd5a2c5de9d4b32e9cf45228.dir
+      size: 1517012
       nfiles: 1
     - path: src/generate.py
       md5: 1412d58995cb76b0812dc2c3337c2308
@@ -46,7 +46,7 @@ stages:
       params.yaml:
         generate.dancers: maria
         generate.hip_correction: false
-        generate.kinetic: false
+        generate.kinetic: true
         generate.look_back: 10
         generate.normalize_body: true
         generate.random_state: 42
@@ -54,9 +54,9 @@ stages:
         generate.steps_limit: 1500
         generate.tags: impro
         generate.test_size: 0.05
-        generate.validation_split: 0.1
+        generate.validation_split: 0.3
     outs:
     - path: ../data/generated
-      md5: 855d6cc6f3a0a5d5270a5cd7030793ee.dir
-      size: 4983892
+      md5: 0a8500e78aa94faaecb40e7ee20c8546.dir
+      size: 4918515
       nfiles: 3
