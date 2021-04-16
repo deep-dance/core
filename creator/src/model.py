@@ -38,19 +38,19 @@ class DeepDanceModel:
     
     def __init__(
             self,
-            look_back=10, lstm_layers=32,
-            mdn_layers=3, validation_split=0.10, custom_loss=True):
+            look_back=10, lstm_layers=32, mdn_layers=3, validation_split=0.10,
+            custom_loss=True, kinetic=False):
+        self.validation_split = validation_split
         self.look_back = look_back
         self.mdn_layers = mdn_layers
         self.custom_loss = custom_loss
         self.trained = False
-
-        self.validation_split = validation_split
-                
+        dim = 52 if kinetic else 51
+        
         self.model = keras.Sequential()
         self.model.add(layers.LSTM(
             lstm_layers,
-            input_shape=(self.look_back, 51),  return_sequences=True))
+            input_shape=(self.look_back, dim),  return_sequences=True))
         self.model.add(layers.LSTM(lstm_layers, return_sequences=True))
         self.model.add(layers.LSTM(lstm_layers))
         self.model.add(layers.Dense(lstm_layers))
@@ -94,11 +94,17 @@ class DeepDanceModel:
         self.model.save(filename)
 
     def generate(self, filename, x_test, seed, steps_limit, look_back=10,
-        hip_correction=True, temperature=1.0, rescale_process=False, rescale_post=False):
+        hip_correction=True, temperature=1.0, rescale_process=False, rescale_post=False,
+        kinetic=False):
+        
+        kinetic_energy = np.array([x_test[seed][-1,-1] + 0.2 * x for x in range(steps_limit)])
+        kinetic_energy_input = kinetic_energy if kinetic else []
+
         performance = generate_performance(
             self.model, x_test[seed], steps_limit=steps_limit, look_back=look_back,
             hip_correction=hip_correction, temp=temperature,
-            rescale_process=rescale_process, rescale_post=rescale_post)
+            rescale_process=rescale_process, rescale_post=rescale_post,
+            kinetic_energy_input=kinetic_energy_input)
         save_seq_to_json(performance, filename)
 
     def evaluate(self, file_scores, file_loss):

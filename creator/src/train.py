@@ -63,6 +63,7 @@ if __name__ == '__main__':
     mdn_layer = params['mdn_layer']
     normalize_body = params['normalize_body']
     hip_correction = params['hip_correction']
+    kinetic = params['kinetic']
 
     print('-------------------------')
     print('dancers:', dancers)
@@ -73,6 +74,7 @@ if __name__ == '__main__':
     print('look_back:', look_back)
     print('normalize_body:', normalize_body)
     print('hip_correction:', hip_correction)
+    print('kinetic:', kinetic)
     print('epochs:', epochs)
     print('batch_size:', batch_size)
     print('lstm_layer:', lstm_layer)
@@ -107,7 +109,7 @@ if __name__ == '__main__':
 
     x, y = get_training_data(dancers=selected_dancers, tags=selected_tags,
         look_back=look_back, normalize_body=normalize_body,
-        hip_correction=hip_correction)
+        hip_correction=hip_correction, add_kinetic_energy=kinetic)
     
     print("Data loaded. Splitting now...")
     x_train, x_test, y_train, y_test=train_test_split(
@@ -126,18 +128,33 @@ if __name__ == '__main__':
     os.makedirs(os.path.join('../', 'data', 'models'), exist_ok=True)
     os.makedirs(os.path.join('../', 'data', 'metrics'), exist_ok=True)
  
-
     model = DeepDanceModel(
         look_back=look_back, lstm_layers=lstm_layer,
         mdn_layers=mdn_layer, validation_split=validation_split,
-        custom_loss=True)
+        kinetic=kinetic)
     model.train(x, y, epochs = epochs, batch_size=batch_size)
 
     print('Saving model and metrics...')
     model.save('../data/models/deep-dance.h5')
     model.evaluate('../data/metrics/deep-dance-scores.json',
         '../data/metrics/deep-dance-loss.json')
+
+    # Make persistent across experiments
+    ids = [
+        str(dancers),
+        str(tags),
+        str(validation_split).replace('.', '_'),
+        str(look_back),
+        'kinetic' if kinetic else 'non_kinetic',
+        str(epochs)
+    ]
+    subfolder = '-'.join(ids)
+
+    folder = '../data/train/curated/' + subfolder
+    os.makedirs(folder, exist_ok=True)
     
+    model.save(folder + '/deep-dance.h5')
+    os.popen('cp -f params.yaml ' + folder + '/params.yaml')
     
     
     
