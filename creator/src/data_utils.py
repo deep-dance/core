@@ -177,7 +177,8 @@ def get_training_data(dancers="all", tags="all", look_back=10, target_length=1, 
             kinetic_energy = [kinetic_energy_pose(dataset[i],dataset[i+1]) for i in range(len(dataset)-1)]
             kinetic_energy = running_average(kinetic_energy, kinetic_energy_running_average)
             kinetic_energy = kinetic_energy.reshape((1,-1)).T
-            dataset = dataset[kinetic_energy_running_average:]
+            dataset = dataset[kinetic_energy_running_average-1:-1]
+            kinetic_energy = kinetic_energy
 
         if not hip_correction:
             # substract hip trajectory every but at hip keypoint
