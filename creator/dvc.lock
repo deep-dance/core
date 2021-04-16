@@ -23,20 +23,20 @@ stages:
         train.validation_split: 0.1
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: c03415c1bf3b48ac6f7e41b4ce19c948
+      md5: 7f725c460c8b0530cdcfcd41a37cbb9c
       size: 127
     - path: ../data/metrics/deep-dance-scores.json
-      md5: fd99213f6fbac2ec3d7d4256a95833e6
+      md5: 358680b014b8440f4d185c1e36bd1602
       size: 79
     - path: ../data/models
-      md5: 22768d7fceb2e05d945222269686f583.dir
+      md5: a2b90eb6c078a9d33e24b2f5f3b94efd.dir
       size: 1513940
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: 22768d7fceb2e05d945222269686f583.dir
+      md5: a2b90eb6c078a9d33e24b2f5f3b94efd.dir
       size: 1513940
       nfiles: 1
     - path: src/generate.py
@@ -57,6 +57,6 @@ stages:
         generate.validation_split: 0.1
     outs:
     - path: ../data/generated
-      md5: 676d741727b08cf5c3c0a1f5fa98ad51.dir
-      size: 4904118
+      md5: cd83accc4e5dd69da04a8844ca289d77.dir
+      size: 4927314
       nfiles: 3
