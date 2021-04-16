@@ -128,7 +128,6 @@ if __name__ == '__main__':
     os.makedirs(os.path.join('../', 'data', 'models'), exist_ok=True)
     os.makedirs(os.path.join('../', 'data', 'metrics'), exist_ok=True)
  
-
     model = DeepDanceModel(
         look_back=look_back, lstm_layers=lstm_layer,
         mdn_layers=mdn_layer, validation_split=validation_split,
@@ -139,7 +138,23 @@ if __name__ == '__main__':
     model.save('../data/models/deep-dance.h5')
     model.evaluate('../data/metrics/deep-dance-scores.json',
         '../data/metrics/deep-dance-loss.json')
+
+    # Make persistent across experiments
+    ids = [
+        str(dancers),
+        str(tags),
+        str(validation_split).replace('.', '_'),
+        str(look_back),
+        'kinetic' if kinetic else 'non_kinetic',
+        str(epochs)
+    ]
+    subfolder = '-'.join(ids)
+
+    folder = '../data/train/curated/' + subfolder
+    os.makedirs(folder, exist_ok=True)
     
+    model.save(folder + '/deep-dance.h5')
+    os.popen('cp -f params.yaml ' + folder + '/params.yaml')
     
     
     

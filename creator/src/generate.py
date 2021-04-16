@@ -33,9 +33,10 @@ def get_parser():
 
 if __name__ == '__main__':
     params = yaml.safe_load(open('params.yaml'))['generate']
+    train_params = yaml.safe_load(open('params.yaml'))['train']
+
     dancers = params['dancers']
     tags = params['tags']
-    
     random_state = params['random_state']
     test_size = params['test_size']
     validation_split = params['validation_split']
@@ -95,10 +96,37 @@ if __name__ == '__main__':
         for rescale_process in [False]:
             for rescale_post in [True]:
                 if not(rescale_process and rescale_post):
-                    postfix = str(temperature).replace('.', '_') + '-' + str(rescale_process) + '-' + str(rescale_post)
-                    model.generate('../data/generated/deep-dance-seq-' + postfix + '.json',
-                        x_test, seed, steps_limit, look_back, hip_correction,
-                        temperature, rescale_process, rescale_post, kinetic)
+                    file_ids = [
+                        str(temperature).replace('.', '_'),
+                        str(rescale_process),
+                        str(rescale_post)
+                    ]
+                    postfix = '-'.join(file_ids)
+                    filename = 'deep-dance-seq-' + postfix + '.json'
+                    filepath = '../data/generated/' + filename
+
+                    model.generate(filepath, x_test, seed, steps_limit, look_back,
+                        hip_correction, temperature, rescale_process, rescale_post,
+                        kinetic)
+
+                    # Make persistent across experiments
+                    ids = [
+                        str(dancers),
+                        str(tags),
+                        str(validation_split).replace('.', '_'),
+                        str(look_back),
+                        'kinetic' if kinetic else 'non_kinetic',
+                        str(train_params['epochs'])
+                    ]
+                    subfolder = '-'.join(ids)
+
+                    folder = '../data/train/curated/' + subfolder
+                    os.makedirs(folder, exist_ok=True)
+                    os.popen('cp -f ' + filepath + ' ' + folder + '/' + filename)
+
+
+                    
+                    
 
     
     

@@ -4,8 +4,8 @@ stages:
     cmd: python src/train.py
     deps:
     - path: src/train.py
-      md5: d4d9e9d3543f033c3004e042f68e7f7d
-      size: 4917
+      md5: 99cef637872cdd59f70d6e5c680905dd
+      size: 5382
     params:
       params.yaml:
         train.batch_size: 64
@@ -23,25 +23,25 @@ stages:
         train.validation_split: 0.1
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 93d5516e64bb0ae8df16dd0c11d170df
-      size: 127
+      md5: 66a876cdd8fc5a8ef638408b357ace67
+      size: 128
     - path: ../data/metrics/deep-dance-scores.json
-      md5: 424aee415aa402d8619027e75a7207e0
-      size: 79
+      md5: f95159c3cc5c65d0cec16ca20f8b3b68
+      size: 80
     - path: ../data/models
-      md5: 0e04936d63b773da319f85bacf146322.dir
+      md5: d33e7154f28966cce0b1547a08f27461.dir
       size: 1513940
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: 0e04936d63b773da319f85bacf146322.dir
+      md5: d33e7154f28966cce0b1547a08f27461.dir
       size: 1513940
       nfiles: 1
     - path: src/generate.py
-      md5: 56571d3d48752539d175c10be4983366
-      size: 3798
+      md5: 1412d58995cb76b0812dc2c3337c2308
+      size: 4773
     params:
       params.yaml:
         generate.dancers: maria
@@ -57,6 +57,6 @@ stages:
         generate.validation_split: 0.1
     outs:
     - path: ../data/generated
-      md5: 7ed2eb7b9316781e72b8b8531d31748b.dir
-      size: 4950311
+      md5: 855d6cc6f3a0a5d5270a5cd7030793ee.dir
+      size: 4983892
       nfiles: 3
