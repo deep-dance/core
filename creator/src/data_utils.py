@@ -165,6 +165,46 @@ def normalize_pose(pose, body_segments, hip_correction=True):
         
     return new_pose
 
+def generate_changing_performance(models, input_frames, look_back, traj= True, body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,0.37101445, 0.20778206, 0.23425052, 0.0848529 , 0.10083677,0.10969228, 0.23822378, 0.19867802, 0.10972143, 0.23854321,0.1993194 ]),rescale_process=False,rescale_post=False):
+    """Generate Changing Performance
+    Wrapper function for generate_performance to change model and temperatur during on generation process
+    Args:
+        
+    Returns:
+        numpy array with generated pose sequence
+    """
+
+    temperature = 1
+    look_back = look_back
+
+    
+    sequence =  [frame for frame in input_frames]
+    #print('init seq '+str(sequence.shape))
+    
+    is_first = True
+    for model in models:
+        for temp in model['temps']:
+            new_sequence = generate_performance(model = model['model'], initial_positions=sequence,
+                                           steps_limit=temp['frames'], temp = temp['temp'],look_back = look_back, 
+                                           rescale_post=False, rescale_process=False, hip_correction=traj)
+            print(new_sequence.shape)
+            sequence = np.reshape(new_sequence,(new_sequence.shape[0],51))
+
+    sequence = np.reshape(sequence,(sequence.shape[0],17,3))
+    
+    if not traj:
+        print("Correct the Hip")
+        sequence = np.array([np.concatenate(([pose[0]], pose[1:] + pose[0])) for pose in sequence])    
+    
+    if rescale_post:
+        # hip_correction = True, because trajectory transformation has already been reversed
+        sequence = np.array([normalize_pose(pose, body_segments,  hip_correction=True) for pose in sequence])
+    
+    
+    return sequence
+
+    
+
 def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3,
                          temp=1.0, sigma_temp=0.0, look_back=10, hip_correction=True, rescale_post=False, rescale_process=False,
                          body_segments = np.array([0.09205135, 0.38231316, 0.37099043, 0.09205053, 0.38036615,
@@ -198,6 +238,8 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
     time = 0
     steps = 0
     performance = [pose for pose in initial_positions]
+    #print(performance[-look_back:])
+    #performance =  initial_positions
     while (steps < steps_limit):
         params = model.predict(np.expand_dims(np.array(performance[-look_back:]), axis=0))
         new_poses = mdn.sample_from_output(params[0], 51, n_mixtures, temp=temp, sigma_temp=sigma_temp)
@@ -211,12 +253,6 @@ def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3
     #reshape performance array
     performance = np.reshape(performance,(np.shape(performance)[0],17,3))
     
-    if not hip_correction:
-        print("Correct the Hip")
-        performance = np.array([np.concatenate(([pose[0]], pose[1:] + pose[0])) for pose in performance])    
-    if rescale_post:
-        # hip_correction = True, because trajectory transformation has already been reversed
-        performance = np.array([normalize_pose(pose, body_segments, hip_correction=True) for pose in performance])
         
     return np.array(performance)
 
