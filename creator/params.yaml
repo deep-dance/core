@@ -5,7 +5,10 @@ prepare:
   test_size: 0.05
   validation_split: 0.1
   look_back: 10
-  
+
+# TODO: Move and merge dataset
+# train and generate params into 
+# prepare stage
 train:
   dancers: maria
   tags: impro
@@ -15,9 +18,10 @@ train:
   look_back: 10
   normalize_body: true
   hip_correction: false
+  kinetic: false
   epochs: 1
-  batch_size: 32
-  lstm_layer: 32
+  batch_size: 64
+  lstm_layer: 64
   mdn_layer: 3
   
 generate:
@@ -29,6 +33,7 @@ generate:
   look_back: 10
   normalize_body: true
   hip_correction: false
+  kinetic: false
   seed: 1500
   steps_limit: 1500
   
