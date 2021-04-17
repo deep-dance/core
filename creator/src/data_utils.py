@@ -240,7 +240,7 @@ def generate_changing_performance(models, input_frames, look_back, traj= True, b
     """Generate Changing Performance
     Wrapper function for generate_performance to change model and temperatur during on generation process
     Args:
-        
+
     Returns:
         numpy array with generated pose sequence
     """
@@ -248,33 +248,33 @@ def generate_changing_performance(models, input_frames, look_back, traj= True, b
     temperature = 1
     look_back = look_back
 
-    
+
     sequence =  [frame for frame in input_frames]
     #print('init seq '+str(sequence.shape))
-    
+
     is_first = True
     for model in models:
         for temp in model['temps']:
             new_sequence = generate_performance(model = model['model'], initial_positions=sequence,
-                                           steps_limit=temp['frames'], temp = temp['temp'],look_back = look_back, 
+                                           steps_limit=temp['frames'], temp = temp['temp'],look_back = look_back,
                                            rescale_post=False, rescale_process=False, hip_correction=traj)
             print(new_sequence.shape)
             sequence = np.reshape(new_sequence,(new_sequence.shape[0],51))
 
     sequence = np.reshape(sequence,(sequence.shape[0],17,3))
-    
+
     if not traj:
         print("Correct the Hip")
-        sequence = np.array([np.concatenate(([pose[0]], pose[1:] + pose[0])) for pose in sequence])    
-    
+        sequence = np.array([np.concatenate(([pose[0]], pose[1:] + pose[0])) for pose in sequence])
+
     if rescale_post:
         # hip_correction = True, because trajectory transformation has already been reversed
         sequence = np.array([normalize_pose(pose, body_segments,  hip_correction=True) for pose in sequence])
-    
-    
+
+
     return sequence
 
-    
+
 
 def generate_performance(model, initial_positions, steps_limit=100, n_mixtures=3,
                          temp=1.0, sigma_temp=0.0, look_back=10, hip_correction=True, rescale_post=False, rescale_process=False,
@@ -439,3 +439,11 @@ def stringlist_to_array(stringlist, delimiter=','):
     for d in string_data:
         d = d.strip()
     return string_data
+
+def transform_framerate(path_to_json, save_to_filename, save_to_base_dir ="./", keep_only_every_other_frame = 2):
+    with open(path_to_json) as f:
+        sequence = json.load(f)
+    max_index = max([int(x) for x in sequence['frames'].keys()])
+    performance = [sequence['frames'][str(i)] for i in range(max_index)]
+    performance = np.array(performance[::keep_only_every_other_frame])
+    save_seq_to_json(performance, save_to_filename, save_to_base_dir)
