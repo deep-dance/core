@@ -9,44 +9,44 @@ stages:
     params:
       params.yaml:
         train.batch_size: 64
-        train.dancers: maria
-        train.epochs: 1
+        train.dancers: maria,raymond
+        train.epochs: 10
         train.hip_correction: false
-        train.kinetic: false
+        train.kinetic: true
         train.look_back: 10
-        train.lstm_layer: 64
+        train.lstm_layer: 32
         train.mdn_layer: 3
         train.normalize_body: true
         train.random_state: 42
         train.tags: impro
         train.test_size: 0.05
-        train.validation_split: 0.1
+        train.validation_split: 0.9
     outs:
     - path: ../data/metrics/deep-dance-loss.json
-      md5: 66a876cdd8fc5a8ef638408b357ace67
-      size: 128
+      md5: 5c410b3c593cff4d0d550a34f574e4d6
+      size: 1060
     - path: ../data/metrics/deep-dance-scores.json
-      md5: f95159c3cc5c65d0cec16ca20f8b3b68
-      size: 80
+      md5: 36000fc55107320e8d1c14eed14b82c4
+      size: 79
     - path: ../data/models
-      md5: d33e7154f28966cce0b1547a08f27461.dir
-      size: 1513940
+      md5: 9edc068a398f8a2767d873440506a874.dir
+      size: 537240
       nfiles: 1
   generate:
     cmd: python src/generate.py
     deps:
     - path: ../data/models
-      md5: d33e7154f28966cce0b1547a08f27461.dir
-      size: 1513940
+      md5: 9edc068a398f8a2767d873440506a874.dir
+      size: 537240
       nfiles: 1
     - path: src/generate.py
       md5: 1412d58995cb76b0812dc2c3337c2308
       size: 4773
     params:
       params.yaml:
-        generate.dancers: maria
+        generate.dancers: maria,raymond
         generate.hip_correction: false
-        generate.kinetic: false
+        generate.kinetic: true
         generate.look_back: 10
         generate.normalize_body: true
         generate.random_state: 42
@@ -54,9 +54,9 @@ stages:
         generate.steps_limit: 1500
         generate.tags: impro
         generate.test_size: 0.05
-        generate.validation_split: 0.1
+        generate.validation_split: 0.9
     outs:
     - path: ../data/generated
-      md5: 855d6cc6f3a0a5d5270a5cd7030793ee.dir
-      size: 4983892
+      md5: 12993efaa1d7a5d3e7ac910b28f7af1a.dir
+      size: 4958564
       nfiles: 3
