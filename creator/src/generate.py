@@ -92,7 +92,7 @@ if __name__ == '__main__':
     model.load('../data/models/deep-dance.h5')
 
     print('Generating sequences...')
-    for temperature in [0.5, 0.75, 1.0]:
+    for temperature in [0.75]:
         for rescale_process in [False]:
             for rescale_post in [True]:
                 if not(rescale_process and rescale_post):

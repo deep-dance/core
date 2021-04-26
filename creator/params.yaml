@@ -34,7 +34,7 @@ generate:
   normalize_body: true
   hip_correction: false
   kinetic: false
-  seed: 1500
-  steps_limit: 1500
-  
-  
+  seed: 8000
+  steps_limit: 180000
+
+
